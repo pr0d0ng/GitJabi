@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 9835,
+  "pull_request": {
+    "id": 3305681082,
+    "number": 9835,
+    "state": "closed",
+    "title": "API 키 제거 및 보안 수정",
+    "body": "이 PR은 이전 코드에서 API 키가 하드코딩되어 노출된 문제를 해결하기 위해 작성되었습니다. API 키는 민감한 정보로, 하드코딩을 통해 저장해서는 안 됩니다. 또한 코드 내에서 일부 보안 취약점(예: 사용자 입력값에 대한 적절한 검증 부족)이 발견되어 추가 수정 작업을 진행하였습니다.\n\n변경 사항으로는 API 키를 환경 변수로 이동하고, 해당 값을 README에서 설명하였습니다. 또한, `eval()` 함수 사용을 제거하고, 안전한 방법으로 치환 작업을 수행했습니다. 향후 유사한 문제가 발생하지 않도록 코드 리뷰를 강화하고, 자동화된 보안 검사를 추가할 것을 제안드립니다.\n\n위 변경 사항은 보안성을 크게 개선하며, 현재 프로덕션 코드에서의 민감한 정보 유출 가능성을 차단합니다. 모든 변경 사항은 테스트 과정을 거쳤으며, 예상되는 부작용은 없습니다. 리뷰 부탁드립니다.",
+    "created_at": "2026-02-20T02:57:46.931063+00:00Z",
+    "updated_at": "2026-02-20T02:57:46.931063+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 43,
+    "deletions": 27,
+    "changed_files": 5,
+    "user": {
+      "login": "user_6",
+      "id": 10472,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "26e821c0dbeb40b5a2462a61dd137c06"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "48f8adae63d146dc96d22dddd7f611fe"
+    }
+  },
+  "repository": {
+    "name": "example-project/backend",
+    "full_name": "my-organization/example-project/backend",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/config/settings.py b/config/settings.py\nindex 12c34d5..67890ef 100644\n--- a/config/settings.py\n+++ b/config/settings.py\n@@ -1,6 +1,7 @@\n API_KEY = \"12345-abcde-67890-fghij\"  # 기존 하드코딩 API 키\n \n-# 보안 문제가 있는 사용자 입력 처리\n+import os\n+API_KEY = os.getenv('API_KEY')  # 환경 변수로 API 키 이동\n \ndef insecure_func(input_data):\n-    return eval(input_data)  # eval() 함수로 인해 발생 가능한 보안 문제\n-+    return exec(input_data)  # 대체 방식을 적용한 안전한 코드"
+  }
+}

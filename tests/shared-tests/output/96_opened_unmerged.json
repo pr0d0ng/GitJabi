@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 936,
+  "pull_request": {
+    "id": 5451161970,
+    "number": 936,
+    "state": "opened",
+    "title": "회원가입 프로세스에서 이메일 인증 로직 추가",
+    "body": "이 PR은 회원가입 프로세스 중 이메일 인증 기능을 추가하는 것을 목표로 합니다. 사용자가 이메일을 통해 본인 인증을 진행할 수 있도록 새로운 API 엔드포인트를 구현하였으며, 관련된 프런트엔드 로직도 수정하였습니다. 하지만 테스트 과정에서 일부 코드에 민감한 데이터를 그대로 노출한 채 커밋한 것이 있어 위험 요소가 있을 수 있습니다.\n\n추가된 로직은 이메일 인증 코드 발송 및 유효성 검증을 포함합니다. 하지만 코드 리뷰 중 하나의 API 키가 하드코딩된 상태로 포함되어 있기 때문에 보안 문제가 우려됩니다. 이 외에, 사용자 입력 검증 로직에서도 코드가 조금 더 강화될 필요가 있습니다. 따라서 리뷰어 분들의 피드백을 받고, 개선점을 반영한 뒤 해당 PR을 병합하는 것을 목표로 하고 있습니다.\n\n변경된 파일은 총 5개이며, 총 120줄의 코드가 추가되었고, 45줄은 삭제되었습니다. 주요 변경 사항은 auth.js와 관련된 API, 그리고 React 컴포넌트에서 상태 관리 로직입니다. 코드 리뷰 부탁드립니다. 감사합니다.",
+    "created_at": "2026-02-20T03:00:08.591711+00:00Z",
+    "updated_at": "2026-02-20T03:00:08.591711+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 120,
+    "deletions": 45,
+    "changed_files": 5,
+    "user": {
+      "login": "user_72",
+      "id": 18582,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "c201196a75614b9899cb9c99a80590ba"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "05743a8fb5574f499447a05c54b933b2"
+    }
+  },
+  "repository": {
+    "name": "myapp-auth-module",
+    "full_name": "my-organization/myapp-auth-module",
+    "private": false,
+    "language": "JavaScript",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/src/auth.js b/src/auth.js\nindex 12abf34..34cd567 100644\n--- a/src/auth.js\n+++ b/src/auth.js\n@@ -1,3 +1,18 @@\n+// TODO: Remove this hardcoded secret before merging\n+const emailApiKey = 'AIzaSyC12345-EXAMPLE-KEY';\n\n exports.sendVerificationEmail = async (userEmail) => {\n+  const verificationCode = Math.floor(100000 + Math.random() * 900000);\n+  console.log(`Generated verification code: ${verificationCode}`); // Debug only, remove in production\n+\n+  // Example of insecure email sending logic\n+  const emailContent = {\n+    to: userEmail,\n+    subject: 'Email Verification',\n+    text: `Your verification code is: ${verificationCode}`\n+  };\n+\n+  try {\n+    const response = await emailService.send(emailApiKey, emailContent);\n+    return response;\n+  } catch (error) {\n+    console.error('Failed to send verification email:', error);\n+    throw new Error('Email service error');\n+  }\n }"
+  }
+}

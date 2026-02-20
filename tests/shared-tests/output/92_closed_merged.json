@@ -1,0 +1,51 @@
+{
+  "action": "closed",
+  "number": 4922,
+  "pull_request": {
+    "id": 3036761720,
+    "number": 4922,
+    "state": "closed",
+    "title": "회원가입 기능 버그 수정 및 보안 강화",
+    "body": "회원가입 기능에서 발견된 주요 버그를 수정하고 보안 강화를 진행한 Pull Request입니다. 기존 코드에서 이메일 검증 로직이 부정확하게 작동하는 문제가 있었으며, 일부 사용자 데이터가 제대로 암호화되지 않고 저장되는 보안상의 허점이 발견되었습니다. 이번 PR에서는 이러한 문제점을 해결하고 추가적인 보안 강화를 위해 다음과 같은 업데이트를 진행했습니다: 1) 이메일 유효성 검사 로직을 개선하여 잘못된 입력을 필터링하도록 수정. 2) 비밀번호 암호화 방식을 PBKDF2로 변경하여 더 안전한 암호화를 구현. 3) 소스 코드에서 확인된 API Key와 같은 민감한 데이터를 제거 및 암호화 환경 변수로 이전. 4) 테스트 케이스 업데이트로 수정된 코드 테스트 완료. 이 PR은 보안 강화를 목표로 하고 있으며, 모든 변경 사항은 안전하게 검토된 후 병합 완료되었습니다.",
+    "created_at": "2026-02-20T03:00:00.839692+00:00Z",
+    "updated_at": "2026-02-20T03:00:00.839692+00:00Z",
+    "merged_at": "2026-02-12T04:23:57Z",
+    "merged": true,
+    "merged_by": {
+      "login": "maintainer_2",
+      "id": 1114,
+      "type": "User",
+      "site_admin": false
+    },
+    "draft": false,
+    "mergeable_state": "clean",
+    "commits": 1,
+    "additions": 150,
+    "deletions": 45,
+    "changed_files": 8,
+    "user": {
+      "login": "user_87",
+      "id": 19398,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "06724d31981f4ea68c740a6e201e57e9"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "2d55ac2401384eddb58c7989643dce6e"
+    }
+  },
+  "repository": {
+    "name": "user-auth-service",
+    "full_name": "my-organization/user-auth-service",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/auth/signup.py b/auth/signup.py\nindex d4e5f70..a324f59 100644\n--- a/auth/signup.py\n+++ b/auth/signup.py\n@@ -45,7 +45,9 @@ class SignupService:\n         if not is_valid_email(email):\n             raise ValueError('Invalid email address')\n \n-        password_hash = sha256(password.encode()).hexdigest()\n+        import hashlib, os\n+        password_hash = hashlib.pbkdf2_hmac(\n+            'sha256', password.encode(), os.urandom(16), 100000)\n         user_data = {\n-            'email': email,\n+            'email': email,\n             'password_hash': password_hash\n         }\n \n@@ -95,7 +97,10 @@ class SignupService:\n \n-API_KEY = \"12345-abcdef-12345\"\n+import os\n+API_KEY = os.getenv(\"API_KEY\")\n \n def connect_to_service():\n     # 인코딩된 데이터 전송\n-    data = encrypt_data(API_KEY, sensitive_data)\n+    sensitive_data = fetch_sensitive_data()\n+    if sensitive_data:\n+        data = encrypt_data(API_KEY, sensitive_data)\n \n     response = requests.post(SERVICE_URL, data=data)\n     if response.status_code != 200:\n"
+  }
+}

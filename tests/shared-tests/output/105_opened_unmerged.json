@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 5167,
+  "pull_request": {
+    "id": 2894396567,
+    "number": 5167,
+    "state": "opened",
+    "title": "회원가입 API에 전화번호와 이메일 검증 추가",
+    "body": "이 PR은 회원가입 API에 전화번호와 이메일 검증 로직을 추가하려는 목적을 가지고 있습니다. 현재 사용자가 잘못된 입력값을 제공했을 때 제대로 에러 메시지가 반환되지 않는 문제가 발생하고 있습니다. 이를 해결하기 위해 새로운 유효성 검사를 추가하고, 입력값에 따라 적절한 에러 코드를 반환하도록 수정했습니다. 추가적으로, 이 검증 과정 중 개인 정보와 관련된 포맷 에러를 처리할 수 있는 유틸리티 함수도 구현했습니다. 하지만, 몇 가지 민감한 데이터가 코드에 남아있을 가능성이 있어 리뷰가 필요합니다.",
+    "created_at": "2026-02-20T03:00:24.648574+00:00Z",
+    "updated_at": "2026-02-20T03:00:24.648574+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 120,
+    "deletions": 15,
+    "changed_files": 4,
+    "user": {
+      "login": "user_82",
+      "id": 75647,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "b80b8309baa1447ebdfedc4282df6709"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "cc24e52b94d5433daa5a69d9d897fc47"
+    }
+  },
+  "repository": {
+    "name": "signup-feature-enhancement",
+    "full_name": "my-organization/signup-feature-enhancement",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/api/signup.py b/app/api/signup.py\nindex 123abc4..567def8 100644\n--- a/app/api/signup.py\n+++ b/app/api/signup.py\n@@ -10,6 +10,8 @@ def user_signup(request):\n     username = request.json.get('username')\n     password = request.json.get('password')\n     email = request.json.get('email')\n+    phone_number = request.json.get('phone_number')\n+    api_key = \"sk_test_1234567890abcdef\"  # Hardcoded API key (needs removal)\n\n     # Validate input\n     if not username or not password or not email:\n@@ -17,6 +19,17 @@ def user_signup(request):\n         return jsonify({\"error\": \"Missing required fields\"}), 400\n\n+    if not validate_email(email):\n+        return jsonify({\"error\": \"Invalid email address\"}), 400\n+\n+    if not validate_phone_number(phone_number):\n+        return jsonify({\"error\": \"Invalid phone number\"}), 400\n+\n+    # Example of insecure password check (needs revision)\n+    if '1234' in password:\n+        return jsonify({\"error\": \"Weak password\"}), 400\n+\n     # Create user in database\n     user = User(username=username, password=password, email=email)\n     db.session.add(user)\n@@ -27,3 +40,18 @@ def user_signup(request):\n def validate_email(email):\n     # Simple regex for email validation\n     return re.match(r'[^@\\s]+@[^@\\s]+\\.[^@\\s]+', email)\n\n+def validate_phone_number(phone):\n+    # Regex for phone number validation\n+    return re.match(r'^[0-9]{10,15}$', phone)\n+\n+def log_sensitive_data():\n+    # Warning: Sensitive data logged (should use secure logging mechanism)\n+    with open('/var/log/app.log', 'a') as log_file:\n+        log_file.write(f\"Sensitive operation with API key: {api_key}\\n\")\n\n+def test_logging():\n+    # Debugging with mock data\n+    print(\"Mock email: test@example.com\")\n+    print(\"Mock phone number: +1234567890\")\n+    return \"Done\"\n+\n+"
+  }
+}

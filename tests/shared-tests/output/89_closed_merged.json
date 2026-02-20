@@ -1,0 +1,51 @@
+{
+  "action": "closed",
+  "number": 3277,
+  "pull_request": {
+    "id": 7345118434,
+    "number": 3277,
+    "state": "closed",
+    "title": "사용자 비밀번호 암호화 수정 및 보안 강화",
+    "body": "이번 PR에서는 기존 사용자 비밀번호 저장 방식을 개선하고 보안을 강화하기 위한 작업을 진행했습니다. 이전에는 비밀번호를 해싱하지 않고 텍스트 형태로 저장하는 보안 취약점이 발견되었습니다. 이러한 문제를 해결하기 위해 bcrypt를 이용해 비밀번호를 강력하게 해싱하여 저장하도록 수정했습니다. 추가로, API 키의 유출 위험이 있는 코드를 제거하고, 새롭게 보안 키를 구성하는 방식을 도입했습니다. 이번 변경은 사용자 데이터의 보안을 강화하며, 향후 보안 사고를 예방하는 데 기여할 것입니다.",
+    "created_at": "2026-02-20T02:59:56.770732+00:00Z",
+    "updated_at": "2026-02-20T02:59:56.770732+00:00Z",
+    "merged_at": "2026-02-16T19:26:02Z",
+    "merged": true,
+    "merged_by": {
+      "login": "maintainer_2",
+      "id": 6454,
+      "type": "User",
+      "site_admin": false
+    },
+    "draft": false,
+    "mergeable_state": "clean",
+    "commits": 1,
+    "additions": 124,
+    "deletions": 78,
+    "changed_files": 5,
+    "user": {
+      "login": "user_69",
+      "id": 60356,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "d98c43ffb31745a3a94df2c6633e3331"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "4cfbc00aecf24b25b18d44c1229e59d0"
+    }
+  },
+  "repository": {
+    "name": "secure-login-system",
+    "full_name": "my-organization/secure-login-system",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/models/user.py b/app/models/user.py\nindex 9834a7c..c02f1a9 100644\n--- a/app/models/user.py\n+++ b/app/models/user.py\n@@ -15,7 +15,10 @@\n class User(BaseModel):\n     username = Column(String, unique=True, nullable=False)\n     email = Column(String, unique=True, nullable=False)\n-    password = Column(String, nullable=False)  # 이전에는 해싱되지 않은 비밀번호를 저장함\n+    password = Column(String, nullable=False)  # bcrypt 해싱 방식 적용\n\n+    def set_password(self, raw_password):\n+        self.password = bcrypt.hashpw(raw_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')\n+\n diff --git a/config/settings.py b/config/settings.py\nindex 9f3d3b2..3c9a2f1 100644\n--- a/config/settings.py\n+++ b/config/settings.py\n@@ -5,5 +5,6 @@\n SECRET_KEY = \"hardcoded-secret\"  # 보안 취약점 발견: 하드코딩된 비밀키\n-API_KEY = \"123456789abcdef\"  # 보안 취약점 발견: 하드코딩된 API 키\n+import os\n+SECRET_KEY = os.getenv(\"SECRET_KEY\", \"fallback-secret\")\n+API_KEY = os.getenv(\"API_KEY\", \"fallback-api-key\")\n\n DEBUG = True\n"
+  }
+}

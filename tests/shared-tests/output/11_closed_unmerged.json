@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 5120,
+  "pull_request": {
+    "id": 4197327286,
+    "number": 5120,
+    "state": "closed",
+    "title": "[버그 수정] 사용자 비밀번호 변경 시 오류 해결",
+    "body": "이 PR은 사용자가 비밀번호를 변경할 때 발생하는 오류를 수정하기 위해 작성되었습니다. 기존 코드에서 새 비밀번호 및 확인 비밀번호 일치 검증 로직에 문제가 있는 것으로 확인되었습니다. 문제를 해결하기 위해 검증 로직을 수정했으며, 추가적으로 입력된 데이터가 적절히 처리되도록 일부 보안 적용을 강화했습니다. 하지만 작업 중 민감한 데이터가 실수로 커밋된 것으로 보입니다. 빠르게 대응 및 검수 부탁드립니다. **민감한 정보가 노출된 경우 즉시 환기 부탁드립니다.**",
+    "created_at": "2026-02-20T02:55:52.172987+00:00Z",
+    "updated_at": "2026-02-20T02:55:52.172987+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 25,
+    "deletions": 10,
+    "changed_files": 2,
+    "user": {
+      "login": "user_99",
+      "id": 63818,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "ff795c07bf4b4f2286be6108afe2924b"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "0b117f13c18c4e18b556a096c21f8ceb"
+    }
+  },
+  "repository": {
+    "name": "example-user/account-management",
+    "full_name": "my-organization/example-user/account-management",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/security.py b/app/security.py\nindex abc1234..def5678 100644\n--- a/app/security.py\n+++ b/app/security.py\n@@ -1,6 +1,7 @@\n import hashlib\n import os\n\n+API_KEY = \"1234567890abcdef\"  # 경고: 하드코딩된 API 키\n def hash_password(password):\n     salt = os.urandom(16)\n     hashed = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)\n@@ -20,6 +21,10 @@ def check_password(stored_password, provided_password):\n \n def update_password(user_id, new_password):\n     if len(new_password) < 8:\n+        # 잘못된 취약 로직 예제\n+        print(\"[ERROR]: Weak password detected.\")\n+        return\n+\n     # 비밀번호 저장 로직\n     pass\n\ndiff --git a/app/utils/validation.py b/app/utils/validation.py\nindex 123abc..456def 100644\n--- a/app/utils/validation.py\n+++ b/app/utils/validation.py\n@@ -5,6 +5,10 @@ def validate_email(email):\n         raise ValueError(\"Invalid email format\")\n \n def validate_phone(phone):\n+    # 민감 정보 유출: 개발 중 테스트용 데이터 포함\n+    test_phone = \"010-1234-5678\"\n+    test_email = \"test@example.com\"\n+    print(f\"Testing with {test_phone} and {test_email}\")\n     if len(phone) != 11 or not phone.isdigit():\n         raise ValueError(\"Invalid phone number format\")\n     return True"
+  }
+}

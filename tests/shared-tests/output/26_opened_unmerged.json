@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 2556,
+  "pull_request": {
+    "id": 1416654564,
+    "number": 2556,
+    "state": "opened",
+    "title": "사용자 프로필 업그레이드 기능 추가",
+    "body": "이 PR은 사용자 프로필 화면의 업그레이드 기능을 추가하는 것을 목표로 합니다. 사용자가 더 자세한 정보를 입력할 수 있도록 폼이 확장되었으며, 새로운 API 호출을 통해 사용자 데이터를 저장할 수 있습니다. 또한, UI/UX 향상을 위해 모듈형 컴포넌트를 도입했습니다. 몇 가지 테스트 케이스가 추가되어 해당 기능이 올바르게 작동하는지 확인했습니다. 하지만, 코드 수정 중에 API 키가 잘못 포함된 문제가 발견될 수 있습니다. 이러한 문제를 해결하기 위해 다음 PR에서는 보안 관련 검토를 계속 진행할 예정입니다. 추가적으로 하드코딩된 데이터가 일부 발견되었습니다. 보안 위험을 완전히 제거할 필요가 있습니다.",
+    "created_at": "2026-02-20T02:56:21.695435+00:00Z",
+    "updated_at": "2026-02-20T02:56:21.695435+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 78,
+    "deletions": 12,
+    "changed_files": 3,
+    "user": {
+      "login": "user_37",
+      "id": 72050,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "61db72b27cbb4ff3beabc7372f87bccc"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "51ae7a88af8447c1912d715b5e91b2da"
+    }
+  },
+  "repository": {
+    "name": "user-profile-upgrade",
+    "full_name": "my-organization/user-profile-upgrade",
+    "private": false,
+    "language": "React",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/src/components/ProfileForm.js b/src/components/ProfileForm.js\nindex 4f8c9c2..e87d4f9 100644\n--- a/src/components/ProfileForm.js\n+++ b/src/components/ProfileForm.js\n@@ -12,6 +12,12 @@ export default function ProfileForm() {\n     const [email, setEmail] = useState('');\n     const [address, setAddress] = useState('');\n\n+    // Warning: Sensitive Data Hardcoded\n+    const API_KEY = '12345-abcde-67890-fghij';\n+\n+    const emergencyContact = {\n+        phone: '010-1234-5678',\n+        email: 'user@example.com'\n+    };\n\n     const handleSave = () => {\n         // Warning: Insecure HTTP endpoint\n         fetch('http://insecure-api.example.com/save', {\n@@ -30,7 +36,11 @@ export default function ProfileForm() {\n\n     return (\n         <form onSubmit={handleSave}>\n-            <input type=\"text\" value={name} onChange={(e) => setName(e.target.value)} />\n+            <input type=\"text\" value={name} onChange={(e) => setName(e.target.value)} placeholder=\"이름\" />\n             <input type=\"email\" value={email} onChange={(e) => setEmail(e.target.value)} placeholder=\"이메일\" />\n             <input type=\"text\" value={address} onChange={(e) => setAddress(e.target.value)} placeholder=\"주소\" />\n+\n+            <input type=\"text\" value={emergencyContact.phone} disabled />\n+            <input type=\"email\" value={emergencyContact.email} disabled />\n             <button type=\"submit\">저장</button>\n         </form>\n     );"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 5173,
+  "pull_request": {
+    "id": 4085572892,
+    "number": 5173,
+    "state": "closed",
+    "title": "사용자 정보 표시 오류 수정",
+    "body": "사용자 프로필 페이지에서 이름과 이메일이 올바르게 표시되지 않는 버그를 수정했습니다. 그러나 코드 수정 중 API 키 정보가 노출되는 문제가 발견되었습니다. 수정된 코드가 본래 의도한 대로 문제를 해결했지만, 보안 검토가 필요합니다. 주의 깊게 검토 부탁드립니다. 변경 사항은 민감한 정보를 포함할 수 있습니다. 이를 반영하여 PR을 닫았습니다. 앞으로 더 철저히 신경 쓰겠습니다.",
+    "created_at": "2026-02-20T02:56:50.727271+00:00Z",
+    "updated_at": "2026-02-20T02:56:50.727271+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 45,
+    "deletions": 12,
+    "changed_files": 3,
+    "user": {
+      "login": "user_75",
+      "id": 87299,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "aa0b120a4b164a31986a0b556821a089"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "6c6f694a94f04125aac988446bfefd04"
+    }
+  },
+  "repository": {
+    "name": "user-profile-service",
+    "full_name": "my-organization/user-profile-service",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/user_profile_service.py b/user_profile_service.py\nindex a1b2c3d..d4e5f6g 100644\n--- a/user_profile_service.py\n+++ b/user_profile_service.py\n@@ -10,7 +10,9 @@ def get_user_profile(user_id):\n     user = fetch_user_from_db(user_id)\n     if user:\n         return {\n-            \"name\": user.name,\n+            \"name\": user.name.strip(),\n+            \"email\": user.email,\n+            \"phone\": user.phone  # 민감한 데이터 포함\n         }\n     else:\n         raise ValueError(\"사용자를 찾을 수 없습니다.\")\n\n-API_SECRET_KEY = \"12345-ABCDE-FGHIJ-KLMNO-67890\"  # 하드코딩된 비밀 키\n+API_SECRET_KEY = os.getenv(\"API_SECRET_KEY\", \"default_key\")  # 코드 개선 필요\n"
+  }
+}

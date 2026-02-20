@@ -1,0 +1,51 @@
+{
+  "action": "closed",
+  "number": 3811,
+  "pull_request": {
+    "id": 8166081461,
+    "number": 3811,
+    "state": "closed",
+    "title": "사용자 인증 문제 수정 및 코드 리팩터링",
+    "body": "이 PR은 사용자 인증 과정에서 발견된 문제를 수정하고, 인증 관련 로직을 더 효율적으로 리팩터링하는 작업을 포함하고 있습니다. 기존 코드에서 하드코딩된 API 키가 발견되었으며, 이를 환경 변수로 옮겨 보안성을 강화했습니다. 추가로, 이메일 및 전화번호와 같은 민감한 정보를 다루는 부분에서 로그에 기록되는 이슈를 해결했습니다. 이러한 변화는 사용자 데이터의 안전성을 보장할뿐만 아니라, 개발 관점에서 더 나은 유지보수성을 제공합니다. 변경 사항은 아래와 같습니다:\n\n1. 사용자 인증 모듈에서 하드코딩된 API 키 제거\n2. 환경 변수 추가 및 관련 환경 파일 `.env` 도입\n3. 민감한 정보가 로그에 노출되지 않도록 로깅 로직 수정\n4. 일부 코드 스타일을 정리하고 불필요한 의존성 삭제\n5. 기존 인증 로직에서 발견된 작은 버그 수정\n\n이 PR은 보안 문제를 시급히 해결하기 위해 작성되었으며, 모든 테스트를 통과하고 문제없이 병합되었습니다.",
+    "created_at": "2026-02-20T02:57:40.156536+00:00Z",
+    "updated_at": "2026-02-20T02:57:40.156536+00:00Z",
+    "merged_at": "2026-02-06T07:33:06Z",
+    "merged": true,
+    "merged_by": {
+      "login": "maintainer_3",
+      "id": 8741,
+      "type": "User",
+      "site_admin": false
+    },
+    "draft": false,
+    "mergeable_state": "clean",
+    "commits": 1,
+    "additions": 75,
+    "deletions": 25,
+    "changed_files": 5,
+    "user": {
+      "login": "user_54",
+      "id": 15833,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "6a71185e9e834110af214d3c584bb0ef"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "fb3f5f34984946ec81e169132723546d"
+    }
+  },
+  "repository": {
+    "name": "user-auth-system",
+    "full_name": "my-organization/user-auth-system",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/auth.py b/auth.py\nindex abc1234..def5678 100644\n--- a/auth.py\n+++ b/auth.py\n@@ -10,7 +10,7 @@\ndef authenticate_user(username, password):\n    # 기존 API 키 하드코딩된 버전 삭제\n-   api_key = \"12345-abcde-hardcoded-key\"\n+   api_key = os.getenv(\"API_KEY\")\n\n    if not api_key:\n        raise ValueError(\"API_KEY is not set in environment variables\")\n@@ -25,10 +25,10 @@\n    logging.info(\"Authenticating user: %s\", username)\n\n    # 사용자 민감 정보가 로그로 기록되지 않도록 수정\n-   logging.debug(\"Received password: %s\", password)\n+   logging.debug(\"Password received and validated\")\n\n    return True\n\n# 기존 코드에서 발견된 이메일 처리 로그 수정\n-def log_user_email(email):\n-   logging.info(\"User email: %s\", email)\n+def log_user_email():\n+   logging.info(\"User email processed securely.\")\n\n# 전화번호가 로그에 노출되지 않도록 변경\n-def log_user_phone(phone):\n-   logging.info(\"User phone: %s\", phone)\n+def log_user_phone():\n+   logging.info(\"User phone processed securely.\")"
+  }
+}

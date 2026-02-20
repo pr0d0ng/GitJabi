@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 591,
+  "pull_request": {
+    "id": 6691095247,
+    "number": 591,
+    "state": "opened",
+    "title": "로그인 보안 패치 및 사용자 데이터 처리 개선",
+    "body": "이 PR은 애플리케이션의 로그인 보안 강화를 위해 몇 가지 중요한 수정 사항을 포함하며, 사용자 데이터 처리 방식을 개선하는 데 초점을 맞추고 있습니다. 주요 변경 사항은 다음과 같습니다:\n\n1. 로그인 로직 개선: 기존에 비해 보안성이 낮은 코드를 수정하여 더 안전한 인증 흐름을 구현했습니다.\n2. 사용자 데이터 필터링 추가: 민감한 정보가 로그에 노출되지 않도록 데이터를 처리하는 방식을 강화했습니다.\n3. 암호화 프로세스 수정: 비밀번호 저장 및 확인 로직에서 더 강력한 암호화 알고리즘을 적용했습니다.\n\n이 PR에서 발견된 문제점 중 일부는 하드코딩된 민감 데이터를 포함하고 있어 보안 위험을 초래할 가능성이 있습니다. 이를 교체하고 숨길 수 있도록 수정했으며, 앞으로 이와 같은 실수가 발생하지 않도록 코드베이스를 리팩터링했습니다. 또한, 기존 로직 개선뿐만 아니라 몇 가지 문서화 작업과 기능 추가도 포함되어 있습니다.\n\n리뷰어 여러분께서는 민감 데이터 처리 및 보안 관련 코드에 대해 특히 주의 깊게 리뷰를 진행해주시길 요청드립니다!",
+    "created_at": "2026-02-20T02:56:38.394023+00:00Z",
+    "updated_at": "2026-02-20T02:56:38.394023+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 253,
+    "deletions": 67,
+    "changed_files": 4,
+    "user": {
+      "login": "user_97",
+      "id": 34425,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "926e349984204e8a90a81f13bb660125"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "384df8c5b99643188c9567996f4d4de5"
+    }
+  },
+  "repository": {
+    "name": "secure-app",
+    "full_name": "my-organization/secure-app",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "--- a/auth/login.py\n+++ b/auth/login.py\n@@ -10,7 +10,11 @@ def authenticate_user(username, password):\n     # 기존 인증 함수 로직\n     stored_password = get_user_password(username)\n-    if password == stored_password: # 단순 비교\n+    if verify_password(password, stored_password): # 안전한 암호 검증 함수로 교체\n         return True\n-    return False\n+    log_auth_attempt(username, success=False)\n+    return False\n+\n+def log_auth_attempt(username, success):\n+    log.info(f\"사용자 로그인 시도: {username}, 성공 여부: {success}\")\n\n--- a/config.py\n+++ b/config.py\n@@ -2,4 +2,8 @@\n  # 하드코딩된 키가 제거됨\n-api_key = \"12345-abcdefg\" # 제거된 API 키\n+import os\n+api_key = os.environ.get(\"API_KEY\")\n+\n-def send_alert(phone_number, message):\n+def send_alert(phone_number=None, message=None):\n+    if not phone_number or not message:\n+        raise ValueError(\"전화번호와 메시지를 입력하세요.\")\n+    log.info(f\"알림 전송 완료: 번호: {phone_number}, 메시지: {message}\")"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 3454,
+  "pull_request": {
+    "id": 3921523925,
+    "number": 3454,
+    "state": "closed",
+    "title": "사용자 정보 출력 기능 수정",
+    "body": "이 Pull Request에서는 사용자 정보 출력 기능을 수정하는 작업이 포함되어 있습니다. 기존 코드에서는 민감한 사용자 정보가 출력될 가능성이 있었으며, 이러한 문제를 해결하기 위해 일부 보안 패치를 적용하였습니다. 그러나 이 PR에 포함된 수정 사항 중 한 파일에 잘못된 접근 제어 로직이 포함되어 있어 보안상 위험 요소가 있을 수 있습니다. 추가적으로 코드 검토 중 일부 API 키와 이메일 정보가 커밋에 노출된 것을 확인하였습니다. 해당 정보를 삭제 대상으로 설정하였으나, 코드 변경 내용을 확인할 때 주의가 필요합니다. 변경 사항은 사용자 인터페이스 개선과 관련된 내용도 포함하고 있습니다. 추가 피드백 부탁드립니다.",
+    "created_at": "2026-02-20T02:56:26.649766+00:00Z",
+    "updated_at": "2026-02-20T02:56:26.649766+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 45,
+    "deletions": 30,
+    "changed_files": 3,
+    "user": {
+      "login": "user_93",
+      "id": 56018,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "98c7e01dd8e54760abe692f5fa8e33ec"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "787e4ca4a4c64af6a661c1cf479300ad"
+    }
+  },
+  "repository": {
+    "name": "korean-user-info-system",
+    "full_name": "my-organization/korean-user-info-system",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/user_info.py b/app/user_info.py\nindex 12345ab..67890cd 100644\n--- a/app/user_info.py\n+++ b/app/user_info.py\n@@ -10,7 +10,7 @@ def show_user_info(user):\n     print(f\"Name: {user['name']}\")\n +   print(f\"Phone: {user['phone']}\")  # 전화번호가 출력됩니다.\n     print(f\"Email: {user['email']}\")\n     print(\"Details: \")\n-    print(f\"Profile: {user['profile_url']}\")\n+    print(\"Profile: Private URL\")\n\ndef connect_to_api():\n-    api_key = \"12345-ABCDE-SECRET-67890\"  # 하드코드된 API 키\n+    api_key = get_env_variable(\"API_KEY\")  # 환경 변수로 수정\n     return api_function(api_key)\n\ndef validate_user(user_data):\n@@ -40,6 +40,6 @@ def validate_user(user_data):\n     if not user_data['email'].endswith(\"@domain.com\"):\n         raise ValueError(\"Invalid email domain\")\n\n-# Test 이메일 (노출 금지)\n-email_test = \"dummy@domain.com\"\n+email_test = \"[REDACTED]\"\n\n return user_data"
+  }
+}

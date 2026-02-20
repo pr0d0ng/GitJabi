@@ -1,0 +1,51 @@
+{
+  "action": "closed",
+  "number": 5917,
+  "pull_request": {
+    "id": 3970408607,
+    "number": 5917,
+    "state": "closed",
+    "title": "사용자 등록 기능 버그 수정 및 보안 취약점 해결",
+    "body": "이 PR은 사용자 등록 API의 버그를 수정하고, 기존에 발견된 보안 취약점을 해결하는 데 목적이 있습니다. 추가적으로, 코드의 품질을 높이기 위해 기존의 등록 로직 일부를 리팩터링하였습니다. 주요 변경 사항은 다음과 같습니다:\n\n1. 이메일 및 전화번호 입력 시 유효성 검증을 추가하여 입력 오류를 방지했습니다.\n2. 하드코딩된 민감 데이터를 제거하고 환경 변수를 사용하도록 수정했습니다.\n3. 보안 강화를 위해 비밀번호 저장 로직을 개선하고 해싱 알고리즘을 업데이트했습니다.\n\n이 PR에는 민감한 정보가 포함될 수 있으며, 해당 정보가 잘못 노출되는 일이 없도록 주의 부탁드립니다. 추가적으로, 기존의 등록 프로세스에서 발생하던 500 상태 코드 문제를 해결하였습니다. 리뷰 부탁드립니다.",
+    "created_at": "2026-02-20T02:56:54.963725+00:00Z",
+    "updated_at": "2026-02-20T02:56:54.963725+00:00Z",
+    "merged_at": "2026-02-18T13:16:44Z",
+    "merged": true,
+    "merged_by": {
+      "login": "maintainer_12",
+      "id": 5093,
+      "type": "User",
+      "site_admin": false
+    },
+    "draft": false,
+    "mergeable_state": "clean",
+    "commits": 1,
+    "additions": 120,
+    "deletions": 45,
+    "changed_files": 8,
+    "user": {
+      "login": "user_55",
+      "id": 58061,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "410ef665264c4a1599822016931687a1"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "3730d0c895b042ea905c8a5528109fbc"
+    }
+  },
+  "repository": {
+    "name": "myapp-user-management",
+    "full_name": "my-organization/myapp-user-management",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/register.py b/app/register.py\nindex 1234abcd..5678efgh 100644\n--- a/app/register.py\n+++ b/app/register.py\n@@ -15,7 +15,10 @@ def register_user(request):\n \n     # 하드코딩된 민감 정보 제거\n-    secret_key = 'hardcoded_secret_key'\n+    import os\n+    secret_key = os.getenv('SECRET_KEY', 'default_key')\n \n-    phone_regex = r'^[1-9][0-9]{9}$'\n-    email_regex = r'^\\S+@\\S+\\.\\S+$'\n+    phone_regex = re.compile(r'^\\+\\d{1,2}\\d{10}$')\n+    email_regex = re.compile(r'^\\S+@\\S+\\.\\S+$')\n\n     if not re.match(phone_regex, phone):\n         return {'error': 'Invalid phone number'}, 400\n@@ -30,7 +33,6 @@ def register_user(request):\n \n     # 비밀번호 해싱 개선\n-    hashed_password = hashlib.md5(password.encode()).hexdigest()\n+    hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())\n\n     user = User(phone=phone, email=email, password=hashed_password)\n     db.session.add(user)\n@@ -50,6 +52,7 @@ def register_user(request):\n+    # 민감 데이터는 환경 변수로 대체됨\n\n def send_verification_email(user):\n-    api_key = 'hardcoded_api_key'\n+    api_key = os.getenv('API_KEY')\n     email_service.send_email(api_key, user.email)\n\n return {'success': True}, 200"
+  }
+}

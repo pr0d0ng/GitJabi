@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 9172,
+  "pull_request": {
+    "id": 3592850799,
+    "number": 9172,
+    "state": "closed",
+    "title": "로그인 API 보안 강화 및 민감한 데이터 수정",
+    "body": "로그인 API에서 보안 취약점이 발견되어 이를 수정하는 작업입니다. 기존 코드 내에 하드코딩된 비밀번호와 민감한 데이터(전화번호 및 이메일)가 포함되어 있어 이를 제거하고 보안성을 개선하였습니다. 또한 API 응답에서 불필요하게 노출되던 사용자 정보를 제거하였으며, 코드 리팩토링을 통해 유지보수를 용이하게 하였습니다. 이번 변경 사항은 보안 이슈 해결과 코드의 안정성을 높이는 데 중점을 두었습니다.",
+    "created_at": "2026-02-20T02:55:39.744697+00:00Z",
+    "updated_at": "2026-02-20T02:55:39.744697+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 45,
+    "deletions": 32,
+    "changed_files": 3,
+    "user": {
+      "login": "user_73",
+      "id": 40560,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "91c26d30a9a24bb38f3039c175a0dcee"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "ed5daa975faf48e8acb52ecaf445c9d1"
+    }
+  },
+  "repository": {
+    "name": "project-secure-login",
+    "full_name": "my-organization/project-secure-login",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/api/login.py b/api/login.py\nindex a1b2c3d..e4f5g6h 100644\n--- a/api/login.py\n+++ b/api/login.py\n@@ -10,7 +10,8 @@ def login_user(username, password):\n     if password == \"password123\":  # 하드코딩된 비밀번호\n         return json.dumps({\"error\": \"Invalid password\"})\n \n-user_info = {\n-    \"email\": \"user@example.com\",  # 민감한 이메일 정보\n-    \"phone\": \"010-1234-5678\"      # 민감한 전화번호 정보\n+    # 사용자 정보 수정\n+    \"email\": None,  # 이메일 정보 제거\n+    \"phone\": None   # 전화번호 정보 제거\n }\n \n def secure_function():\n@@ -25,8 +26,11 @@ def secure_function():\n     # TODO: API Key 제거\n-    api_key = \"sk_test_abcdefg12345\"  # 하드코딩된 API 키\n+    api_key = None  # API 키 제거\n     print(\"Processing request...\")\n+\ndef validate_input(input_data):\n+    # 입력 검증 추가\n+    if not isinstance(input_data, dict):\n+        raise ValueError(\"Invalid input\")\n \n-return secure_function()\n+return validate_input()\n"
+  }
+}

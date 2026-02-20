@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 3092,
+  "pull_request": {
+    "id": 2571452105,
+    "number": 3092,
+    "state": "closed",
+    "title": "API 키 및 민감한 정보 제거 및 일부 보안 코드 수정",
+    "body": "이 PR은 코드를 검토하던 중 발견된 민감한 정보 및 보안 문제를 해결하기 위해 생성되었습니다. 기존 코드에서 하드코딩된 API 키와 민감한 사용자 정보(전화번호 및 이메일)가 포함되어 있는 부분을 제거하였습니다. 또한 보안 문제를 일으킬 수 있는 특정 로직을 수정하였으며, 코드 리팩토링을 통해 향후 유지보수를 용이하게 하고자 합니다.\n\n해결된 문제:\n1. 코드 내 하드코딩된 API 키 제거.\n2. 전화번호 및 이메일 등 민감한 정보가 소스 코드 내에 포함되어 있던 부분 제거.\n3. 데이터 처리 과정에서 보안 취약점을 일으킬 수 있는 논리 수정.\n\n변경사항:\n- 하드코딩된 비밀번호 및 API 키를 환경 변수로 전환.\n- 변수 네이밍 및 데이터 암호화 로직 보강.\n- README에 보안 관련 지침 추가.\n\n테스트는 코드 수정 후 모두 통과하였으며, 테스트 범위를 확장하여 보안 관련 사항도 확인했습니다. 코드 리뷰 부탁드립니다.",
+    "created_at": "2026-02-20T02:56:39.067578+00:00Z",
+    "updated_at": "2026-02-20T02:56:39.067578+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 120,
+    "deletions": 95,
+    "changed_files": 6,
+    "user": {
+      "login": "user_11",
+      "id": 71691,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "51b3b1a779a242b8ab6dcf159a045b5e"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "d48406c861204400a19451c680132858"
+    }
+  },
+  "repository": {
+    "name": "secure-data-handler",
+    "full_name": "my-organization/secure-data-handler",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/config.py b/app/config.py\nindex 8943f76..c3a8d12 100644\n--- a/app/config.py\n+++ b/app/config.py\n@@ -10,7 +10,7 @@\n DEBUG = True\n-API_KEY = '1234567890abcdef1234567890abcdef'\n+import os\n+API_KEY = os.getenv('API_KEY')\n\ndiff --git a/app/user_data.py b/app/user_data.py\nindex a123bc4..a45def6 100644\n--- a/app/user_data.py\n+++ b/app/user_data.py\n@@ -15,10 +15,10 @@ def get_user_info():\n-    email = 'example@example.com'\n-    phone_number = '010-1234-5678'\n+    email = None  # Removed sensitive information\n+    phone_number = None\n+    # Ensure these details are fetched securely from DB\n\ndiff --git a/README.md b/README.md\nindex 091d2fc..23fdc91 100644\n--- a/README.md\n+++ b/README.md\n@@ -5,6 +5,10 @@\n ## 보안 주의사항:\n+1. 절대 API 키를 코드에 하드코딩하지 마세요.\n+2. 민감한 정보는 환경 변수나 암호화된 저장소를 사용하세요.\n+3. 보안 문제를 방지하기 위한 내부 코드 리뷰 절차를 준수하세요.\n"
+  }
+}

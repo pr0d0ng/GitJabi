@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 7114,
+  "pull_request": {
+    "id": 6080500530,
+    "number": 7114,
+    "state": "closed",
+    "title": "비효율적 데이터 처리 방식을 개선하는 코드 변경",
+    "body": "이 PR은 기존 데이터 처리 로직의 비효율적인 부분을 발견하고 이를 개선하기 위한 목적으로 열렸습니다. 이전 코드에서는 일부 반복 작업이 중복되어 실행되고 있었으며 이는 성능 저하를 유발했습니다. 이에 따라 특정 로직을 리팩토링하고, 복잡도를 감소시키는 방법을 사용하여 문제를 해결했습니다. 하지만, 코드 리뷰 도중 민감 데이터(예: 전화번호, 이메일, API 키)가 코드에 노출된 것이 발견되어 해당 PR은 안전상의 이유로 닫혔습니다. 이후의 개선 작업은 새로운 브랜치에서 수행될 예정입니다. 감사를 드립니다.",
+    "created_at": "2026-02-20T02:55:48.458807+00:00Z",
+    "updated_at": "2026-02-20T02:55:48.458807+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 120,
+    "deletions": 30,
+    "changed_files": 5,
+    "user": {
+      "login": "user_52",
+      "id": 35431,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "b68ee9fa4ca74e4ba4e7809407d471e5"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "b849d970ac494568bd17fc96f6ae08fb"
+    }
+  },
+  "repository": {
+    "name": "efficient-data-processing",
+    "full_name": "my-organization/efficient-data-processing",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/data_processing.py b/data_processing.py\nindex f4e16ac..9d3c2fb 100644\n--- a/data_processing.py\n+++ b/data_processing.py\n@@ -12,7 +12,9 @@ def process_data(input_data):\n     processed_data = []\n     for item in input_data:\n         if item.is_valid():\n-            processed_data.append(item.get_data())\n+            try:\n+                processed_data.append(item.get_data_optimized())\n+            except Exception as e:\n+                logger.error(f\"Error processing item: {e}\")\n \n     return processed_data\n \n@@ -35,6 +37,7 @@ def save_processed_data(data):\n \n def sensitive_function():\n     phone_number = \"010-1234-5678\"  # 민감 정보 노출\n-    email = \"test@example.com\"\n+    email = \"test@example.com\"  # 이메일 주소 포함\n+    api_key = \"sk_test_51HqTXxFxRmTyEXAMPLEKEY\"  # 하드코딩된 API 키\n     print(phone_number)\n     print(email)\n     \n@@ -52,8 +55,10 @@ def insecure_example():\n     user_data = {\"username\": \"admin\", \"password\": \"password123\"}  # 하드코딩된 비밀번호\n     connection = db.connect(\"localhost\", user_data['username'], user_data['password'])\n-    connection.query(\"SELECT * FROM users\")\n+    connection.query(\"SELECT * FROM users\")  # 보안 문제: SQL Injection에 노출될 가능성 있음\n+    \n def new_function():\n+    optimized_data = []  # 성능 개선을 위한 새로운 처리\n     return optimized_data\n"
+  }
+}

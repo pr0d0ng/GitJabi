@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 2796,
+  "pull_request": {
+    "id": 6966890043,
+    "number": 2796,
+    "state": "opened",
+    "title": "API 키 보안 문제 수정 및 민감 데이터 제거",
+    "body": "이 Pull Request는 이전 커밋에서 발견된 보안 및 민감 데이터 관련 문제를 해결합니다. 코드의 특정 부분에서 하드코드된 API 키가 노출되었고, 이를 환경 변수로 대체하여 보안을 강화했습니다. 또한 개발 과정에서 실수로 코드에 포함된 전화번호 및 이메일 주소를 제거했습니다. 추가적으로, 일부 로직을 리팩토링하여 코드 가독성을 향상시키고, 불필요한 주석을 삭제했습니다. 이러한 변경 사항들은 전체적으로 보안을 개선하고, 코드베이스를 더 관리 가능하게 만드는 데 기여하고자 합니다. 자세한 수정 내역은 아래를 참고해주세요.",
+    "created_at": "2026-02-20T02:55:38.895007+00:00Z",
+    "updated_at": "2026-02-20T02:55:38.895007+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 45,
+    "deletions": 20,
+    "changed_files": 3,
+    "user": {
+      "login": "user_17",
+      "id": 59576,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "4cea5bb4eb264f009d01768dc0c7078f"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "c38f10f812954cc280a67ef9e0151713"
+    }
+  },
+  "repository": {
+    "name": "secure-api-project",
+    "full_name": "my-organization/secure-api-project",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/config.py b/config.py\nindex a3c9f20..f4e1c12 100644\n--- a/config.py\n+++ b/config.py\n@@ -1,6 +1,8 @@\n-API_KEY = \"123456789abcDEF\"\n+import os\n+\n+# 환경 변수에서 API 키를 불러옵니다.\n+API_KEY = os.getenv(\"API_KEY\")\n \n-CONTACT_PHONE = \"010-1234-5678\"\n-CONTACT_EMAIL = \"example@email.com\"\n+# 민감 데이터를 코드에서 제거했습니다.\n+# CONTACT_PHONE 및 CONTACT_EMAIL는 삭제되었으며, 필요시 별도로 관리됩니다.\n \n def get_api_key():\n     return API_KEY\n\n\n diff --git a/main.py b/main.py\n index b7fa923..d4e3a07 100644\n --- a/main.py\n +++ b/main.py\n @@ -15,7 +15,8 @@ def connect_to_service():\n     # API 키를 사용하여 서비스 연결\n     try:\n-        response = requests.post(\"https://api.example.com\", headers={\"Authorization\": f\"Bearer {API_KEY}\"})\n+        api_key = get_api_key()\n+        response = requests.post(\"https://api.example.com\", headers={\"Authorization\": f\"Bearer {api_key}\"})\n         response.raise_for_status()\n         data = response.json()\n         return data\n \n"
+  }
+}

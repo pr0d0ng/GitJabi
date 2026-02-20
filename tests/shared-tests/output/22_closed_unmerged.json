@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 6700,
+  "pull_request": {
+    "id": 1729030550,
+    "number": 6700,
+    "state": "closed",
+    "title": "보안 문제가 있는 코드 제거 및 데이터 정리",
+    "body": "이 Pull Request는 코드베이스에서 보안 문제가 있는 코드와 잠재적으로 민감한 데이터를 제거하기 위해 만들어졌습니다. 이전에 hardcoded된 API 키와 이메일, 전화번호가 코드에 직접 포함되어 있었으며, 이는 보안적으로 큰 리스크를 초래할 수 있습니다. 해당 데이터를 제거하면서 기존의 기능을 유지하도록 코드를 리팩터링했습니다. 하지만 보안 문제가 잠재적으로 클 수 있으므로 추가 리뷰가 필요합니다.",
+    "created_at": "2026-02-20T02:56:08.916940+00:00Z",
+    "updated_at": "2026-02-20T02:56:08.916940+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 87,
+    "deletions": 162,
+    "changed_files": 5,
+    "user": {
+      "login": "user_12",
+      "id": 67292,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "8d609b9a74d342ab8742929a62bf7c27"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "955f8903b2f2470cb9ca481cfb589403"
+    }
+  },
+  "repository": {
+    "name": "myapp-security-cleanup",
+    "full_name": "my-organization/myapp-security-cleanup",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/config.py b/app/config.py\nindex f8392a3..48f2bf1 100644\n--- a/app/config.py\n+++ b/app/config.py\n@@ -1,6 +1,8 @@\n-class Config:\n-    # API_KEY: '12345-abcde-67890-fghij'\n-    API_KEY = '12345-abcde-67890-fghij'  # NOTE: This is a hardcoded key\n-    EMAIL = 'old-email@example.com'      # Placeholder email\n-    PHONE = '+821012345678'              # Example phone number\n+from os import environ\n+\n+class Config:\n+    API_KEY = environ.get(\"API_KEY\")  # API key now set via environment variable\n+    EMAIL = environ.get(\"EMAIL\")      # Email now set via environment variable\n+    PHONE = environ.get(\"PHONE\")      # Phone number now set via environment variable\n\ndiff --git a/app/main.py b/app/main.py\nindex 54c374e..c5d89f4 100644\n--- a/app/main.py\n+++ b/app/main.py\n@@ -5,7 +5,7 @@ def send_email():\n     # Example function for sending emails\n     config = Config()\n     print(\"Sending email using the following configuration:\")\n-    print(f\"Email: {config.EMAIL}\")\n+    print(\"Email: [REDACTED]\")  # Removed sensitive output\n     \n def connect_to_service():\n     config = Config()\n@@ -12,7 +12,7 @@ def connect_to_service():\n     print(\"Connecting to service with API Key:\")\n-    print(f\"API Key: {config.API_KEY}\")  # NOTE: This exposes the API key in logs\n+    print(\"API Key: [REDACTED]\")  # Removed sensitive output\n\n if __name__ == \"__main__\":\n     send_email()\n     connect_to_service()"
+  }
+}

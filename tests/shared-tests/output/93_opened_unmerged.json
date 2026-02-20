@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 5036,
+  "pull_request": {
+    "id": 7361529684,
+    "number": 5036,
+    "state": "opened",
+    "title": "새로운 API 기능 추가 및 코드 리팩토링",
+    "body": "이번 Pull Request에서는 새로운 API 기능을 추가하고 기존 코드의 일부를 리팩토링했습니다. 추가된 API는 사용자 데이터를 조회하는 기능을 포함하고 있으며, 더욱 간결하고 효율적인 코드 구조를 위해 리팩토링 작업이 수행되었습니다. 하지만, 코드 리뷰 중 사용자 데이터를 처리하는 부분에 민감 데이터가 포함될 가능성이 발견되었습니다. 이메일 주소 및 전화번호가 하드코딩되어 있어 보안상의 문제가 있을 수 있습니다. 또한, API 키 형식의 데이터가 코드에 남아있는 것도 확인되어 수정이 필요합니다. 이 부분에 대해 심층 리뷰 부탁드립니다.",
+    "created_at": "2026-02-20T03:00:00.722547+00:00Z",
+    "updated_at": "2026-02-20T03:00:00.722547+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 523,
+    "deletions": 214,
+    "changed_files": 9,
+    "user": {
+      "login": "user_89",
+      "id": 10260,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "d84fdffe240a40bb9703f2502c3f6806"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "871d2d56cbba426f96f722f56981d137"
+    }
+  },
+  "repository": {
+    "name": "project-team/api-service",
+    "full_name": "my-organization/project-team/api-service",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/api.py b/app/api.py\nindex 1234567..89abcdef 100644\n--- a/app/api.py\n+++ b/app/api.py\n@@ -10,6 +10,11 @@ def get_user_data(user_id):\n     # 사용자 데이터 조회 API\n     user = database.get_user(user_id)\n     if user:\n+        # 민감 데이터가 하드코딩되어 있음\n+        admin_email = \"admin@example.com\"  # 이메일 제거 필요\n+        support_phone = \"+821012345678\"  # 전화번호 제거 필요\n+        api_key = \"12345-ABCDE-SECRET\"  # API 키 제거 필요\n+        logger.info(f\"Sensitive data: {admin_email}, {support_phone}\")\n         return jsonify(user)\n     return jsonify({\"error\": \"User not found\"}), 404\n\n@@ -50,6 +55,11 @@ def insecure_function():\n     # 잠재적으로 보안 문제가 발생할 수 있는 코드\n     user_password = \"password123\"  # 하드코딩된 비밀번호\n     connection = db.connect(\"db://insecure-connection\")  # 보안성이 낮은 연결 예제\n+    # 개선 필요: 하드코드된 데이터는 환경 변수로 대체해야 함\n+    if user_password == \"password123\":\n+        logger.warning(\"Using default password: Highly insecure\")\n+    connection.execute(\"DROP TABLE users\")  # 위험한 쿼리 예제\n+    return connection\n\n # 변경된 일부 다른 코드들...\n\n"
+  }
+}

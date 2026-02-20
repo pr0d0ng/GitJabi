@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 9603,
+  "pull_request": {
+    "id": 6741619414,
+    "number": 9603,
+    "state": "closed",
+    "title": "로그 파일 형식 업데이트 및 민감 정보 실수로 포함",
+    "body": "이 Pull Request는 데이터 로깅 시스템에서 로그 형식을 수정하기 위해 작성되었습니다. 새로운 요구사항에 따라 로그 파일의 데이터 포맷을 업데이트했으며, 추가적으로 몇 가지 코드 클린업도 진행했습니다. 하지만 작업 중 실수로 민감한 정보와 보안 문제를 포함하게 되었습니다. 상세 변경 사항은 아래와 같습니다:\n\n1. 로그 출력 형식을 보다 읽기 쉬운 구조로 업데이트했습니다.\n2. JSON 데이터 처리를 최적화하면서 일부 불필요한 코드 제거했습니다.\n3. 잘못된 디버깅용 API 키와 이메일 주소가 코드에 포함됨으로써 보안상 문제가 발생할 가능성이 있습니다.\n4. 특정 코드 부분에서 하드코딩된 비밀번호가 누락되지 않고 포함된 점을 확인했습니다.\n\n이 PR은 이미 폐쇄되었으며 병합되지 않았습니다. 추가적으로 여기에 포함된 모든 민감한 데이터를 삭제하고 올바른 방식으로 다시 작업하여 새로운 PR을 올릴 예정입니다.",
+    "created_at": "2026-02-20T03:00:26.638523+00:00Z",
+    "updated_at": "2026-02-20T03:00:26.638523+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 75,
+    "deletions": 30,
+    "changed_files": 4,
+    "user": {
+      "login": "user_97",
+      "id": 29084,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "b992696aa4f840d389ac6824bf53adef"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "4b519c1b88434aff862b43bb9836d0f1"
+    }
+  },
+  "repository": {
+    "name": "data-logging-system",
+    "full_name": "my-organization/data-logging-system",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/logger.py b/logger.py\nindex 1234abc..5678def 100644\n--- a/logger.py\n+++ b/logger.py\n@@ -10,6 +10,7 @@ class Logger:\n \n     def log(self, message):\n         log_data = {\n-            \"timestamp\": datetime.now().isoformat(),\n-            \"message\": message\n+            \"timestamp\": datetime.now().strftime('%Y-%m-%d %H:%M:%S'),\n+            \"level\": \"INFO\",\n+            \"message\": message\n         }\n         print(json.dumps(log_data))\n \n@@ -45,7 +46,9 @@ def debug():\n     logger = Logger()\n     logger.log(\"Debugging mode active\")\n\n-API_KEY = \"12345-abcde-test-key-98765\"\n+API_KEY = \"12345-abcde-test-key-98765\"  # TODO: REMOVE BEFORE PRODUCTION\n+email = \"example@example.com\"  # Removing for security compliance\n+password = \"hardcoded_password_123\"  # TEST DATA REMOVE\n \ndef process_data(data):\n     sensitive_data = {\"phone\": \"010-1234-5678\"}\n     return sensitive_data\n"
+  }
+}

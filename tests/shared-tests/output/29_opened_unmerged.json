@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 9068,
+  "pull_request": {
+    "id": 6142473816,
+    "number": 9068,
+    "state": "opened",
+    "title": "회원가입 API에서 비밀번호 암호화 문제 수정",
+    "body": "회원가입 API 코드에서 비밀번호가 암호화되지 않은 채 데이터베이스에 저장되는 문제가 발견되었습니다. 이 PR에서는 해당 문제를 수정하여 사용자의 비밀번호가 안전하게 해시되도록 개선하였습니다. 추가적으로, 회원 정보를 처리하는 중 API 키가 노출될 가능성이 있는 부분도 확인하여 관련 로직을 업데이트했습니다. 코드 변경 사항과 테스트 결과를 포함하였으니 확인 부탁드립니다.\n\n주요 수정 사항:\n1. bcrypt 모듈을 사용하여 비밀번호를 안전하게 해시 처리.\n2. 기존 로직에서 노출된 API 키 값을 제거하고, 환경 변수로 대체.\n3. 테스트 코드를 추가하여 비밀번호 암호화 기능이 정상적으로 작동하는지 검토.\n4. 부수적 리팩토링 작업으로 코드 가독성을 향상.\n\n이 PR이 적용되면 사용자 데이터 보안성이 향상될 것으로 기대됩니다. 검토하신 후 피드백 부탁드립니다.",
+    "created_at": "2026-02-20T02:56:18.002106+00:00Z",
+    "updated_at": "2026-02-20T02:56:18.002106+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 45,
+    "deletions": 12,
+    "changed_files": 3,
+    "user": {
+      "login": "user_84",
+      "id": 13932,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "3a6d10cb734f4ccabc19c0fffd657e6f"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "0b8293773c93405cb25f8b84e5848d9e"
+    }
+  },
+  "repository": {
+    "name": "myapp-user-auth-service",
+    "full_name": "my-organization/myapp-user-auth-service",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/routes/register.py b/app/routes/register.py\nindex a1b2c3d..e4f5g6h 100644\n--- a/app/routes/register.py\n+++ b/app/routes/register.py\n@@ -10,7 +10,11 @@ def register_user():\n     password = request.json.get('password')\n     email = request.json.get('email')\n \n-    user = User(name=name, email=email, password=password)  # 비밀번호 암호화되지 않음\n+    # 비밀번호를 bcrypt로 해시 처리\n+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())\n+    user = User(name=name, email=email, password=hashed_password)\n+    \n+    # API 키 제거 및 개선된 환경 변수 로직 적용\n+    api_key = os.getenv(\"API_KEY\")  # 기존 하드코딩 값을 대체\n \n     try:\n         db.session.add(user)\n@@ -25,6 +29,12 @@ def register_user():\n         return jsonify({\"message\": \"User registered successfully\"}), 201\n     except Exception as e:\n         db.session.rollback()\n+        # 보안상 불필요한 디버그 코드 제거\n+        # print(f\"API Key used: {api_key}\")\n+        print(\"Error occurred, details logged in error log.\")\n         return jsonify({\"error\": \"Failed to register user\"}), 500\n \n # 기존 API 키 하드코딩 제거\n-API_KEY = \"12345-abcdef-67890-ghijk\"  # 이 줄은 보안 문제가 될 수 있음\n+\n+if __name__ == \"__main__\":\n+    app.run(debug=False)"
+  }
+}

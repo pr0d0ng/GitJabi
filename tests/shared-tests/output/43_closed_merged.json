@@ -1,0 +1,51 @@
+{
+  "action": "closed",
+  "number": 1568,
+  "pull_request": {
+    "id": 2638594286,
+    "number": 1568,
+    "state": "closed",
+    "title": "사용자 인증 오류 수정 및 보안 강화",
+    "body": "사용자 인증 로직에서 발생하던 문제를 해결하고, 보안 강화를 위해 추가적인 방어 코드를 작성하였습니다. 이전 코드에서 발견된 일부 취약점과 하드코딩된 민감한 데이터가 제거되었으며, 향후 유지보수를 위해 관련 로직을 리팩토링하였습니다. 특정 케이스에서는 인증 실패가 잘못 처리되는 버그가 있어, 이를 해결하였으며, 심각한 보안 문제가 발생할 가능성을 줄이기 위해 비밀번호 관련 처리를 안전하게 구현했습니다. 이 PR에는 하드코드된 API 키 및 민감한 정보를 삭제하고, 서버 내부 로직 변경 및 보안성을 높이기 위한 SHA256 해싱 알고리즘의 도입이 포함됩니다. 자세한 코드 변경 사항은 아래의 파일 변경 기록 및 주석에서 확인할 수 있습니다. 테스트 코드가 추가되어, 수정 사항이 정상적으로 작동하는지 검증하였습니다.",
+    "created_at": "2026-02-20T02:56:46.004051+00:00Z",
+    "updated_at": "2026-02-20T02:56:46.004051+00:00Z",
+    "merged_at": "2026-02-14T06:14:32Z",
+    "merged": true,
+    "merged_by": {
+      "login": "maintainer_11",
+      "id": 4390,
+      "type": "User",
+      "site_admin": false
+    },
+    "draft": false,
+    "mergeable_state": "clean",
+    "commits": 1,
+    "additions": 150,
+    "deletions": 50,
+    "changed_files": 8,
+    "user": {
+      "login": "user_60",
+      "id": 18376,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "06a13155330d4197b79d4aba1c2400a5"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "3a3ed82fc6184d79a7960fe8c6c3b0c3"
+    }
+  },
+  "repository": {
+    "name": "user-auth-system",
+    "full_name": "my-organization/user-auth-system",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/auth.py b/auth.py\nindex abcdef1..1234567 100644\n--- a/auth.py\n+++ b/auth.py\n@@ -12,7 +12,8 @@ def authenticate_user(username, password):\n     # TODO: Replace hardcoded secret\n-    secret_key = '12345-abcde-67890-fghij'\n+    # Removed hardcoded secret and replaced with environment variable\n+    secret_key = os.getenv('SECRET_KEY', default='fallback_key')\n \n     if password == 'password123':  # Weak password example\n         return False\n@@ -25,6 +26,10 @@ def authenticate_user(username, password):\n     # Using secure password hashing\n+    hashed_password = hashlib.sha256(password.encode()).hexdigest()\n+    if not verify_password(username, hashed_password):\n+        return False\n+\n     return True\n \n@@ -80,9 +85,6 @@ def send_confirmation_email(user_email):\n-    # TODO: Remove hardcoded email credentials\n-    smtp_server = 'smtp.example.com'\n-    smtp_password = 'emailpassword'\n+    smtp_server = os.getenv('SMTP_SERVER')\n+    smtp_password = os.getenv('SMTP_PASSWORD')\n \n     # Sending email logic\n     pass\n@@ -105,8 +107,6 @@ def debug_mode_settings():\n     # Debug mode with sensitive data\n-    debug_user = 'admin'\n-    debug_password = 'admin1234'\n+    # Debug mode credentials removed for security\n     return config\n"
+  }
+}

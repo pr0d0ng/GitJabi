@@ -1,0 +1,51 @@
+{
+  "action": "closed",
+  "number": 8190,
+  "pull_request": {
+    "id": 2882552796,
+    "number": 8190,
+    "state": "closed",
+    "title": "사용자 인증 시스템 버그 수정 및 보안 강화",
+    "body": "이번 PR에서는 사용자 인증 로직의 버그를 수정하고, 보안 강화를 위해 몇 가지 중요한 변경 사항을 적용하였습니다. 기존 코드에서는 사용자 입력 값을 제대로 검증하지 않아 공격자가 악의적인 입력을 통해 보안 문제를 일으킬 가능성이 있었습니다. 이 PR에서는 입력 검증 로직을 강화하고, 민감한 정보를 암호화 저장하도록 수정하였습니다.\n\n또한 코드 내에 실수로 하드코딩된 API 키가 노출되어 있어, 이를 환경 변수로 분리하여 보안 강화를 도모하였습니다. 추가적으로 사용되지 않는 변수와 함수를 제거하고, 일부 중복 코드를 리팩토링하여 전체적인 코드 품질도 개선되었습니다.\n\n테스트 케이스를 추가하여 변경 사항들이 제대로 동작하는지 확인하였으며, 팀원들의 검토 이후 병합을 진행하였습니다. 앞으로도 보안과 유지보수성을 고려한 코드 작성을 최우선으로 할 예정입니다.",
+    "created_at": "2026-02-20T02:57:33.886058+00:00Z",
+    "updated_at": "2026-02-20T02:57:33.886058+00:00Z",
+    "merged_at": "2026-02-10T01:32:55Z",
+    "merged": true,
+    "merged_by": {
+      "login": "maintainer_16",
+      "id": 8613,
+      "type": "User",
+      "site_admin": false
+    },
+    "draft": false,
+    "mergeable_state": "clean",
+    "commits": 1,
+    "additions": 256,
+    "deletions": 89,
+    "changed_files": 12,
+    "user": {
+      "login": "user_44",
+      "id": 25287,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "10931a484b9b41ff816a49380b4eebf3"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "505cc0c2def84f2797db5e7bb101e39a"
+    }
+  },
+  "repository": {
+    "name": "secure-auth-system",
+    "full_name": "my-organization/secure-auth-system",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/auth.py b/auth.py\nindex 1a2b3c4..5d6e7f8 100644\n--- a/auth.py\n+++ b/auth.py\n@@ -10,7 +10,8 @@ USER_DB = {\n }\n \n def login(user_id, password):\n-    if user_id in USER_DB and USER_DB[user_id]['password'] == password:\n+    if not validate_input(user_id) or not validate_input(password):\n+        return {'error': 'Invalid input'}\n+    if user_id in USER_DB and verify_password(password, USER_DB[user_id]['password']):\n         return {'message': 'Login successful'}\n     return {'error': 'Login failed'}\n \n@@ -35,6 +36,7 @@ def reset_password(user_id, old_password, new_password):\n         raise Exception('Incorrect password')\n     # Updating password\n     USER_DB[user_id]['password'] = hash_password(new_password)\n+\n+    log_event('Password changed for user: ' + user_id)\n     return {'message': 'Password updated'}\n \n def validate_input(value):\n@@ -50,8 +52,6 @@ def validate_input(value):\n     if any(c in value for c in [';', '--', '\\\\']):\n         return False\n     return True\n-\n-# Temporary API Key (REMOVE IN PRODUCTION)\n-api_key = \"sk_test_12345ABCDEF\"\n\n env_api_key = os.getenv(\"API_KEY\")\n if not env_api_key:\n     raise EnvironmentError('API_KEY not set in environment')"
+  }
+}

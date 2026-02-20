@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 3055,
+  "pull_request": {
+    "id": 9044657201,
+    "number": 3055,
+    "state": "closed",
+    "title": "API Key Hardcoded 제거 및 에러 핸들링 개선",
+    "body": "이 PR은 코드에서 하드코딩된 API 키를 제거하고 환경 변수를 사용하도록 업데이트합니다. 또한, 일부 에러 핸들링 로직을 개선하여 에러 발생 시 사용자에게 좀 더 명확한 메시지를 제공하도록 수정했습니다.\n\n기존 코드에서 API 키가 소스 코드에 직접 노출되어 있어 보안상 큰 문제가 발생할 수 있었습니다. 이를 해결하기 위해 dotenv 패키지로 환경 변수를 지원하는 방향으로 수정하였고, 또한 로깅 메커니즘을 추가하여 에러 발생 시 적절한 정보를 로그로 남길 수 있도록 개선했습니다.\n\n변경사항은 다음과 같습니다:\n1. 환경 변수로 API 키 관리 (`process.env.API_KEY` 활용)\n2. 하드코딩된 이메일 및 전화번호 제거\n3. 에러 발생 시 사용자에게 유의미한 피드백 제공\n4. 코드 가독성을 위한 약간의 리팩토링\n\n이번 변경은 보안 리스크를 낮추는 동시에 사용자 경험을 개선하는 데 중점을 두었습니다. 하지만, 변경된 사항이 많은 만큼 리뷰를 꼼꼼히 부탁드립니다.",
+    "created_at": "2026-02-20T02:59:28.028390+00:00Z",
+    "updated_at": "2026-02-20T02:59:28.028390+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 120,
+    "deletions": 85,
+    "changed_files": 7,
+    "user": {
+      "login": "user_85",
+      "id": 33620,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "8d55d8a6831d4270b3c7f9e8dabf349a"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "3ae6ef7ed4254ba38e422ad1dfb5c1ae"
+    }
+  },
+  "repository": {
+    "name": "secure-api-project",
+    "full_name": "my-organization/secure-api-project",
+    "private": false,
+    "language": "JavaScript",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/src/config.js b/src/config.js\nindex b123abc..d567def 100644\n--- a/src/config.js\n+++ b/src/config.js\n@@ -1,7 +1,9 @@\n-module.exports = {\n-    apiKey: \"12345-ABCDE-SECRET-67890\",\n-    supportEmail: \"support@company.com\",\n-    supportPhone: \"+821012345678\"\n+require('dotenv').config();\n+\n+module.exports = {\n+    apiKey: process.env.API_KEY,\n+    supportEmail: process.env.SUPPORT_EMAIL,\n+    supportPhone: process.env.SUPPORT_PHONE\n };\n\ndiff --git a/src/errorHandler.js b/src/errorHandler.js\nindex a6789bc..c9876de 100644\n--- a/src/errorHandler.js\n+++ b/src/errorHandler.js\n@@ -10,7 +10,11 @@ function handleError(err, req, res) {\n     if (err.status) {\n         res.status(err.status).json({ error: err.message });\n     } else {\n-        res.status(500).json({ error: 'Unknown error occurred.' });\n+        console.error('Unhandled error:', err);\n+        res.status(500).json({\n+            error: 'An unexpected error occurred. Please try again later.',\n+            timestamp: new Date().toISOString()\n+        });\n     }\n }\n \n@@ -25,5 +29,6 @@ module.exports = {\n     handleError\n };\n \n+// Added timestamp for better error tracking\n"
+  }
+}

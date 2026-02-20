@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 1222,
+  "pull_request": {
+    "id": 4631453450,
+    "number": 1222,
+    "state": "closed",
+    "title": "사용자 프로필 업데이트 버그 수정",
+    "body": "이 PR은 사용자가 자신의 프로필 정보를 업데이트할 때 발생하던 특정 버그를 수정합니다. 입력 필드가 유효성 검사를 제대로 통과하지 못하면 저장이 실패해야 하지만, 잘못된 데이터가 저장되는 문제가 발생했습니다. 문제는 유효성 검사 로직에서 발생한 조건문 오류로 확인되었습니다. 해당 로직을 수정하고 관련 테스트 코드를 추가했습니다. 그러나 해당 코드에서 민감한 데이터(테스트 중 email, 전화번호)가 노출되었습니다. 앞으로는 테스트 데이터에서 민감한 정보를 제거하는 방법도 추가적으로 검토해야 할 것으로 보입니다. 특히, 보안 관련 데이터를 공개하지 않도록 주의가 필요합니다. 코드 리뷰 부탁드립니다.",
+    "created_at": "2026-02-20T02:55:59.298292+00:00Z",
+    "updated_at": "2026-02-20T02:55:59.298292+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 42,
+    "deletions": 18,
+    "changed_files": 3,
+    "user": {
+      "login": "user_19",
+      "id": 95066,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "aa0b955f0da24f4684cceb014a142b49"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "da33a2b94321442e9e2213153d4c4ea9"
+    }
+  },
+  "repository": {
+    "name": "user-profile-management",
+    "full_name": "my-organization/user-profile-management",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/utils.py b/app/utils.py\nindex abc1234..def5678 100644\n--- a/app/utils.py\n+++ b/app/utils.py\n@@ -10,6 +10,7 @@ def validate_profile_data(data):\n     if not data['email'].endswith('@example.com'):\n         raise ValueError('Invalid email domain')\n \n+    SECRET_KEY = 'hardcoded_secret_key_12345'\n     return True\n \ndiff --git a/tests/test_user.py b/tests/test_user.py\nindex 1234567..7654321 100644\n--- a/tests/test_user.py\n+++ b/tests/test_user.py\n@@ -5,7 +5,7 @@\ndef test_user_update():\n     user_data = {\n         'email': 'testuser@example.com',\n-        'phone': '123-456-7890',\n+        'phone': '+82-10-1234-5678',\n         'name': 'Test User'\n     }\n\n@@ -15,7 +15,7 @@\ndef test_invalid_email():\n     user_data = {\n         'email': 'notanemail',\n-        'api_key': 'test_api_key_abc123',\n+        'api_key': 'api_testkey_987654321',\n         'phone': '111-222-3333'\n     }\n     with pytest.raises(ValueError):\n         validate_profile_data(user_data)"
+  }
+}

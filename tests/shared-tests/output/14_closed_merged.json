@@ -1,0 +1,51 @@
+{
+  "action": "closed",
+  "number": 2897,
+  "pull_request": {
+    "id": 2698389588,
+    "number": 2897,
+    "state": "closed",
+    "title": "암호화 로직 수정 및 보안 강화",
+    "body": "이 PR은 민감 데이터 보호를 위한 암호화 로직을 수정하고, 기존에 발견된 보안 취약점을 해결하기 위해 작성되었습니다. 코드는 AES256 암호화 알고리즘을 적용하였으며, 기존에 하드코딩된 API 키와 비밀번호를 제거하고 환경 변수를 통해 관리하도록 개선했습니다. 또한 코드의 가독성을 높이기 위해 일부 함수명을 변경하고 중복 코드를 제거했습니다. 하지만 리팩터링 과정에서 코드 양의 증감이 발생했으며, 민감한 데이터를 처리하는 로직이 포함되어 있으므로 보안 리뷰가 필요합니다. 테스트 케이스는 모두 통과하였으며, CI/CD 결과도 성공적입니다. 리뷰 후 승인 부탁드립니다.",
+    "created_at": "2026-02-20T02:55:57.489262+00:00Z",
+    "updated_at": "2026-02-20T02:55:57.489262+00:00Z",
+    "merged_at": "2026-02-19T01:26:44Z",
+    "merged": true,
+    "merged_by": {
+      "login": "maintainer_10",
+      "id": 7584,
+      "type": "User",
+      "site_admin": false
+    },
+    "draft": false,
+    "mergeable_state": "clean",
+    "commits": 1,
+    "additions": 120,
+    "deletions": 35,
+    "changed_files": 5,
+    "user": {
+      "login": "user_46",
+      "id": 58756,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "471e4708c7704843b16e3440db4ad32d"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "40ff9bb9f3c3427f87160226adc1bcae"
+    }
+  },
+  "repository": {
+    "name": "security-project",
+    "full_name": "my-organization/security-project",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/config.py b/app/config.py\nindex 1234567..89abcde 100644\n--- a/app/config.py\n+++ b/app/config.py\n@@ -1,6 +1,8 @@\n-API_KEY = \"1234567890abcdef1234567890abcdef\"  # Hardcoded API Key\n+import os\n+\n+API_KEY = os.getenv(\"API_KEY\")  # Secure API Key Reference\n \n-DB_PASSWORD = \"password123\"  # Hardcoded Password\n+DB_PASSWORD = os.getenv(\"DB_PASSWORD\")  # Replaced with environment variable\n \n-DEBUG_MODE = True  # Insecure default\n+DEBUG_MODE = False  # Secure default\n \n def connect_to_db():\n     pass\n@@ -34,10 +36,18 @@ def encrypt_data(data):\n     from Crypto.Cipher import AES\n     from base64 import b64encode\n \n-    cipher = AES.new(\"examplekey123456\", AES.MODE_EAX)  # Hardcoded encryption key\n+    encryption_key = os.getenv(\"ENCRYPTION_KEY\")\n+    if not encryption_key:\n+        raise ValueError(\"ENCRYPTION_KEY not found in environment variables\")\n+\n+    cipher = AES.new(encryption_key.encode(\"utf-8\"), AES.MODE_EAX)\n     nonce = cipher.nonce\n     ciphertext, tag = cipher.encrypt_and_digest(data.encode(\"utf-8\"))\n \n     return b64encode(nonce + ciphertext).decode(\"utf-8\")\n\n+def sanitize_input(value):\n+    if \"<\" in value or \">\" in value:\n+        raise ValueError(\"Unescaped characters detected in input\")\n+    return value.strip()\n+\n def decrypt_data(encrypted_data):\n     from base64 import b64decode\n     from Crypto.Cipher import AES"
+  }
+}

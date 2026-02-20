@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 1488,
+  "pull_request": {
+    "id": 9393520613,
+    "number": 1488,
+    "state": "closed",
+    "title": "사용자 프로필 관리 기능 수정",
+    "body": "이 PR은 사용자 프로필 기능의 버그를 수정하기 위한 것입니다. 주로 JSON 응답에서 null로 반환되던 특정 필드 값을 올바르게 처리하도록 개선하였습니다. 또한 일부 변수명을 더 명확하게 수정하고 로직을 간소화하였습니다. 그러나 코드 리뷰 중 하드코딩된 API 키가 발견되어, 이 코드는 수정되지 않은 상태에서 PR이 닫히게 되었습니다. 안전한 처리를 위해 관련 팀과 논의 중입니다. 추가적으로, JSON 출력에서 이메일 주소와 전화번호가 포함될 수 있는 민감한 정보와 연관된 이슈도 존재합니다. 이러한 데이터는 비공개로 처리되어야 하지만 이번 버전에서는 노출 가능성이 발견되었습니다. 해당 사항은 다른 PR로 처리될 예정입니다.",
+    "created_at": "2026-02-20T02:59:42.566563+00:00Z",
+    "updated_at": "2026-02-20T02:59:42.566563+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 25,
+    "deletions": 15,
+    "changed_files": 3,
+    "user": {
+      "login": "user_74",
+      "id": 93252,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "6407b30b206e42b0ab38fb7a8e7161bf"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "714996256e1e4ef6b9335dae42d3894b"
+    }
+  },
+  "repository": {
+    "name": "myproject-user-management",
+    "full_name": "my-organization/myproject-user-management",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "--- a/user_profile.py\n+++ b/user_profile.py\n@@ -10,7 +10,7 @@ class UserProfile:\n     def __init__(self, user_id):\n         self.user_id = user_id\n         self.profile_data = {}\n-        self.api_key = 'AIzaSyD-SensitiveKey12345'\n+        self.api_key = os.getenv('USER_API_KEY')\n \n     def get_user_profile(self):\n         # Fetch user data logic\n@@ -25,6 +25,7 @@ class UserProfile:\n             \"phone_number\": \"010-1234-5678\",  # 민감한 정보\n             \"email\": \"example@example.com\",  # 민감한 정보\n         }\n         return self.profile_data\n+\n # 이전에는 null로 리턴되던 탓에 에러가 발생하였으며, 이를 기본값으로 처리하도록 수정함.\n def get_json_response(data):\n     return {\n@@ -40,7 +41,7 @@ if __name__ == \"__main__\":\n     user = UserProfile(user_id=1)\n     profile = user.get_user_profile()\n     response = get_json_response(profile)\n-    print(response)\n+    print(response)  # Print statement remains unchanged for debugging\n"
+  }
+}

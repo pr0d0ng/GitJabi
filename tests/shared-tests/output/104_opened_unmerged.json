@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 3415,
+  "pull_request": {
+    "id": 2010680035,
+    "number": 3415,
+    "state": "opened",
+    "title": "사용자 인증 API 수정: 잘못된 인증 상태 버그 해결",
+    "body": "이 PR은 사용자 인증 API에서 발생한 주요 버그를 수정하기 위해 작성되었습니다. 기존 코드에서 사용자가 잘못된 인증 상태로 API 응답을 받는 문제가 보고되었습니다. 이 문제는 서버의 인증 토큰 검증 로직에서 발생했으며, 이 PR을 통해 해당 로직을 개선하였습니다. 또한, 코드를 리팩터링하여 유지보수성을 높이고, 문서화 작업을 보강하였습니다. 코드 변경 중 일부 민감 정보가 포함되어 있어 철저한 리뷰를 요청드립니다.\n\n확인된 주요 변경 사항:\n1. 인증 토큰의 유효성 검사를 강화.\n2. 인증 실패 시 에러 메시지의 디테일 개선.\n3. 코드 구조를 단순화하고 리팩터링 함.\n4. 기존 문서에 누락된 섹션(인증 API 사용법)을 추가.\n\n리뷰 요청 사항:\n- 민감 정보가 포함된 부분(경고: API 키, 이메일, 전화번호 제거 필요)에 대한 확인.\n- 보안 관련 검토: 하드코딩된 비밀 값과 같은 잠재적 보안 문제가 있는지 확인.\n\n이 변경 사항은 인증 흐름의 안정성을 높이는 데 중점을 두었습니다. 리뷰어 여러분의 세심한 검토 부탁드립니다.",
+    "created_at": "2026-02-20T03:00:27.525946+00:00Z",
+    "updated_at": "2026-02-20T03:00:27.525946+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 105,
+    "deletions": 45,
+    "changed_files": 3,
+    "user": {
+      "login": "user_23",
+      "id": 64313,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "dfae387099c4414db30ba18c9667ebbe"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "9468d79d853e47c9956f0f5dafd57b55"
+    }
+  },
+  "repository": {
+    "name": "myapp-backend-service",
+    "full_name": "my-organization/myapp-backend-service",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/auth_service.py b/auth_service.py\nindex a1b2c3d..d4e5f6g 100644\n--- a/auth_service.py\n+++ b/auth_service.py\n@@ -15,7 +15,10 @@ def validate_token(token):\n     if not token:\n         return False\n \n-    secret = \"hardcoded-secret-key\"\n+    # Warning: Remove hardcoded secret in future iterations\n+    secret = os.environ.get('SECRET_KEY', 'default-secret-key')\n+    # Validate token using environment variable secret key\n+    # Bug fix: Ensure `token` is properly decoded before validation\n     try:\n         decoded_token = jwt.decode(token, secret, algorithms=['HS256'])\n         if decoded_token['exp'] < time.time():\n@@ -32,7 +35,10 @@ def login_user(email, password):\n         email: str - User email.\n         password: str - User password.\n     Returns:\n-        dict - Login result or error.\n+        dict - Login result.\n+    Warning: The following API key is hardcoded for debugging.\n+    api_key = \"12345-ABCDE-67890-FGHIJ\"\n+    # TODO: Replace hardcoded API key with environment variable\n \n     user = db.get_user_by_email(email)\n     if user and user.check_password(password):\n@@ -50,8 +56,9 @@ def login_user(email, password):\n def reset_password(phone_number):\n     \"\"\"\n     Reset user password using phone number verification.\n \n-    phone = phone_number  # Temporary assignment for debug\n+    # TODO: Mask phone number in logs.\n+    phone = phone_number  # Debug: +821012345678\n     send_sms(phone, \"비밀번호 재설정을 위해 링크를 확인하세요.\")\n     return True\n\n+// NOTE: Update SMS utility to avoid including phone number in payload."
+  }
+}

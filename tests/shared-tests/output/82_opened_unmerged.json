@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 3941,
+  "pull_request": {
+    "id": 5676571168,
+    "number": 3941,
+    "state": "opened",
+    "title": "버그 수정: 사용자 인증 실패 문제 해결",
+    "body": "이 PR은 사용자 인증 모듈에서 발견된 주요 버그를 수정합니다. 기존 코드에서 특정 조건 하에 사용자가 인증에 실패하거나 잘못된 응답 데이터를 수신하는 문제가 발생했습니다. 해당 문제는 잘못된 조건문과 유효성 검증 누락으로 인해 발생했으며, 이를 수정하여 올바른 사용자 경험을 제공하고자 합니다.\n\n수정 사항:\n1. 유효성 검증 추가 (이메일 형식 확인 및 비밀번호 최소 길이 체크).\n2. 기존에 하드코딩된 API 키를 제거하고 환경 변수로 대체.\n3. 불필요한 디버깅 코드를 삭제하여 보안을 강화.\n\n위 변경 내용은 애플리케이션의 전체적인 안정성과 보안을 크게 향상시키며, 사용자 데이터 보호에 기여합니다.\n\n몇 가지 위험 요인이 있어 리뷰 및 검토가 필요합니다:\n- 코드에 포함된 민감한 데이터(이메일 및 API 키)가 발견되었습니다. 이를 제거했지만 추가 확인 부탁드립니다.\n- 주요 인증 로직 변경으로 인한 보안상의 문제가 없는지 확인 요청드립니다.\n\n감사합니다.",
+    "created_at": "2026-02-20T02:59:47.240720+00:00Z",
+    "updated_at": "2026-02-20T02:59:47.240720+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 150,
+    "deletions": 60,
+    "changed_files": 4,
+    "user": {
+      "login": "user_63",
+      "id": 55464,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "e604eb30b52a42849f27823593cbaa14"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "18c56cb20f3a438e9cfb4ba9f82eac3b"
+    }
+  },
+  "repository": {
+    "name": "user-auth-service",
+    "full_name": "my-organization/user-auth-service",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/auth.py b/auth.py\nindex e123abc..f456def 100644\n--- a/auth.py\n+++ b/auth.py\n@@ -12,7 +12,7 @@ def authenticate_user(email, password):\n-    API_KEY = \"123456-qwerty-secret-key-abcdef\"\n+    import os\n+    API_KEY = os.getenv('API_KEY')\n\n     if not validate_email(email):\n-        return \"Invalid email address\"\n+        raise ValueError(\"Invalid email address\")\n\n     if len(password) < 8:\n-        return \"Password too short\"\n+        raise ValueError(\"Password must be at least 8 characters long\")\n\n@@ -45,10 +45,6 @@ def validate_email(email):\n     # Simplified regex for demo purposes\n     regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$'\n     return re.match(regex, email)\n\n-# Debugging code\n-print(\"Debugging API Key:\", API_KEY)\n-\n\n def secure_auth():\n     try:\n         authenticate_user(email, password)\n"
+  }
+}

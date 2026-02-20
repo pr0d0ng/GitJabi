@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 2914,
+  "pull_request": {
+    "id": 2565707230,
+    "number": 2914,
+    "state": "opened",
+    "title": "사용자 계정 정보 저장 버그 수정",
+    "body": "이 PR은 사용자 계정 정보를 저장하는 로직에서 발생하는 버그를 수정합니다. 기존 코드에서는 사용자 입력 데이터를 검증하지 않아 잘못된 형식의 이메일이 저장될 수 있는 문제가 있었습니다. 이로 인해 데이터의 무결성과 사용자 경험에 문제가 발생할 가능성이 있었습니다. 추가적으로, 몇몇 하드코드된 API 키가 코드베이스에 남아있는 것을 발견하여 이를 환경 변수로 대체하였습니다. 이를 통해 보안 및 유연성을 높였습니다. 변경된 부분은 주로 사용자 데이터 처리 로직과 환경 변수 설정 관련 코드입니다. 이 변경은 데이터의 무결성을 보장하고 보안을 강화하는 데 필요한 작업입니다. PR 검토 부탁드립니다.",
+    "created_at": "2026-02-20T02:55:52.096394+00:00Z",
+    "updated_at": "2026-02-20T02:55:52.096394+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 120,
+    "deletions": 35,
+    "changed_files": 5,
+    "user": {
+      "login": "user_39",
+      "id": 38957,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "c0595edaca7e4f6aa223cfc701714ab6"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "a21c7fb98a2d4fadae378bc69fe579b4"
+    }
+  },
+  "repository": {
+    "name": "secure-user-management",
+    "full_name": "my-organization/secure-user-management",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/models/user.py b/app/models/user.py\nindex 1a2b3c4..5d6e7f8 100644\n--- a/app/models/user.py\n+++ b/app/models/user.py\n@@ -45,7 +45,7 @@ class User(Base):\n         self.email = email\n \n def save_user_data(user):\n-    email = user.email  # 잘못된 이메일 형식 확인 없음\n+    email = validate_email(user.email)  # 이메일 형식 검증 추가\n     save_to_db(user)\n \n def validate_email(email):\n@@ -55,7 +55,12 @@ def validate_email(email):\n \n # TODO: 하드코드된 API 키 제거 필요\n-API_KEY = \"12345-abcde-67890-fghij\"\n+# 환경 변수에서 API 키 가져오기\n+import os\n+API_KEY = os.getenv(\"API_KEY\")\n+if not API_KEY:\n+    raise ValueError(\"Environment variable 'API_KEY' is not set\")\n \n def connect_to_service():\n     # 기존에는 하드코드된 API 키를 사용했습니다.\n-    service.connect(api_key=API_KEY)\n+    service.connect(api_key=API_KEY)\n\n# 전화번호 및 이메일 포맷 확인\n-def save_contact_info(phone, email):\n+def save_contact_info(phone_number, email):\n+    # 전화번호 유효성 검사를 추가합니다.\n+    if not is_valid_phone_number(phone_number):\n+        raise ValueError(\"유효하지 않은 전화번호입니다.\")\n+    phone = phone_number\n+    save_to_db({\"phone\": phone, \"email\": email})"
+  }
+}

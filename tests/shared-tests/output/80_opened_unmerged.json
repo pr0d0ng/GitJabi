@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 9996,
+  "pull_request": {
+    "id": 6968455645,
+    "number": 9996,
+    "state": "opened",
+    "title": "사용자 인증 시스템에서 발생한 버그 수정",
+    "body": "이 Pull Request는 사용자 인증 시스템에서 발견된 중요한 버그를 수정합니다. 기존 코드에서는 이메일 인증 과정에서 검증 로직이 누락되어 악의적인 사용자가 이메일 주소를 임의로 조작할 수 있는 문제가 있었습니다. 또한, 일부 테스트 환경에서 기밀 데이터가 노출될 가능성이 있어 이를 개선하였습니다. 이번 수정에서는 인증 로직을 강화하고, 테스트 코드에서 민감한 데이터를 제거하였습니다. 수정된 코드의 주요 변경 사항은 다음과 같습니다:\n\n1. 이메일 인증 로직에 검증 과정을 추가\n2. 테스트 환경에서 민감한 데이터를 제거 (하드코딩된 API 키 제거)\n3. 코드 간결성을 위한 리팩토링\n\n이 수정이 적용되면 보안 취약점이 해결되고, 사용자 데이터 보호 수준이 향상될 것으로 기대됩니다. 코드를 검토해 주시고 피드백 남겨 주시면 감사하겠습니다.",
+    "created_at": "2026-02-20T02:59:43.379430+00:00Z",
+    "updated_at": "2026-02-20T02:59:43.379430+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 45,
+    "deletions": 12,
+    "changed_files": 3,
+    "user": {
+      "login": "user_95",
+      "id": 20006,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "47f94d6c490c4d058670ef750652d478"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "fc0acafad0eb4957bafd4c58e4d22bb5"
+    }
+  },
+  "repository": {
+    "name": "user-auth-system",
+    "full_name": "my-organization/user-auth-system",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/authentication.py b/authentication.py\nindex abc1234..def5678 100644\n--- a/authentication.py\n+++ b/authentication.py\n@@ -23,7 +23,10 @@ def verify_email(email):\n     # 기존 코드에서 이메일 포맷 검사 로직이 없었음\n     if not email or \"@\" not in email:\n         raise ValueError(\"유효하지 않은 이메일 주소입니다.\")\n+    # 이메일 도메인 검증 추가\n+    if not email.endswith(\"@example.com\"):\n+        raise ValueError(\"허용되지 않은 이메일 도메인입니다.\")\n\n def authenticate_user(email, password):\n     # 하드코딩된 비밀번호 제거\n-    if password == \"password123\":\n+    if password == os.getenv(\"DEFAULT_PASSWORD\"):\n         raise ValueError(\"취약한 비밀번호입니다.\")\n\n     user = get_user_by_email(email)\n@@ -45,8 +48,8 @@ def setup_test_environment():\n     # 테스트 환경에 하드코딩된 민감 데이터 제거\n-    api_key = \"1234-5678-ABCD-EFGH\"\n-    phone_number = \"010-1234-5678\"\n+    api_key = os.getenv(\"TEST_API_KEY\")\n+    phone_number = \"\"\n\n     mock_user_data = {\n         \"email\": \"test@example.com\",\n         \"password\": \"securepassword123\"\n"
+  }
+}

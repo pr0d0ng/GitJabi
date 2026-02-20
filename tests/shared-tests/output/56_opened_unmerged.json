@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 4899,
+  "pull_request": {
+    "id": 9788605577,
+    "number": 4899,
+    "state": "opened",
+    "title": "사용자 로그인 오류 수정 및 입력 검증 강화",
+    "body": "사용자 로그인 프로세스에서 발생하던 버그를 수정하고 입력 폼에 대한 보안을 강화하는 패치를 추가했습니다. 이번 변경으로 인해 클라이언트에서 입력 검증이 강화되며, 더 이상 부적절한 데이터가 서버로 전달되지 않도록 하였습니다. 추가로, 비밀번호 필드에서 비정상적인 입력값을 필터링하고, 이메일 주소 유효성을 보다 철저히 검증하도록 개선하였습니다. 이전 일부 코드에서 하드코딩된 비밀번호 관련 정보가 발견되었으며, 이는 보안상의 큰 위협이 될 수 있었습니다. 해당 코드를 수정하여 안전한 방식으로 비밀번호 처리가 이루어지도록 변경하였습니다. 이 PR은 관련 테스트케이스를 추가하여 안정성을 확보했으며, 코드 리뷰를 통해 추가적인 피드백을 받고자 합니다.",
+    "created_at": "2026-02-20T02:57:33.684786+00:00Z",
+    "updated_at": "2026-02-20T02:57:33.684786+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 145,
+    "deletions": 78,
+    "changed_files": 5,
+    "user": {
+      "login": "user_6",
+      "id": 30756,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "4ae54c1b36d34db9be40de012773b3a1"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "f79c216d049e44c69c3301a765a729de"
+    }
+  },
+  "repository": {
+    "name": "my-org/authentication-service",
+    "full_name": "my-organization/my-org/authentication-service",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/auth/utils.py b/auth/utils.py\nindex 3f2c5b6..a7c8f4e 100644\n--- a/auth/utils.py\n+++ b/auth/utils.py\n@@ -12,7 +12,11 @@ def validate_password(password):\n-    # TODO: 중요! 아직 비밀번호 복잡성 검사를 추가하지 않았음\n-    return password == 'hardcoded-password'\n+    import re\n+    password_pattern = r'^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d@$!%*#?&]{8,}$'\n+    if not re.match(password_pattern, password):\n+        raise ValueError(\"비밀번호는 최소 8자 이상, 문자 및 숫자를 포함해야 합니다.\")\n+    return True\n\n def validate_email(email):\n+    email_pattern = r'^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$'\n+    if not re.match(email_pattern, email):\n+        raise ValueError(\"유효하지 않은 이메일 형식입니다.\")\n+    return True\n\n# SAMPLE_KEY = '123456789-abcdef'   # 하드코딩된 API 키 제거\n\n-# print(validate_password('hardcoded-password'))\n+print(validate_password('example_password123'))\n"
+  }
+}

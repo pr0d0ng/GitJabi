@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 7901,
+  "pull_request": {
+    "id": 8993394116,
+    "number": 7901,
+    "state": "opened",
+    "title": "사용자 인증 API 신규 기능 추가",
+    "body": "이 PR은 사용자 인증 API에 새로운 기능을 추가하기 위한 것입니다. 이번 변경은 기존 인증 방식에 추가로 이메일 인증과 2단계 인증을 선택적으로 사용할 수 있는 기능을 제공합니다. 이를 통해 보안 수준을 한층 높이고, 사용자 환경을 개선하고자 합니다. 주요 변경사항은 다음과 같습니다:\n- 이메일을 통한 인증 방식 추가\n- 2단계 인증(2FA)을 위한 Google Authenticator 통합\n- 새로운 환경 변수 추가(API_KEY, SECRET_KEY) 및 코드에서 변수 참조 방식 수정\n\n보안 및 민감 데이터 관련 사항:\n1) PR 코드에 데이터 유출 위험이 없는지 검토 부탁드립니다.\n2) 예제 코드는 실제 운영 환경에서 사용되지 않도록 주의가 필요합니다.\n\n이 PR이 병합되기 전까지는 테스트 서버에서만 테스트되어야 합니다. 리뷰 부탁드립니다!",
+    "created_at": "2026-02-20T02:59:50.425948+00:00Z",
+    "updated_at": "2026-02-20T02:59:50.425948+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 450,
+    "deletions": 30,
+    "changed_files": 12,
+    "user": {
+      "login": "user_89",
+      "id": 89919,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "5e61ac8716174ab48b0ecd415fe57fe3"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "c99bbd969dcf4ec0a2e05bff344f75ea"
+    }
+  },
+  "repository": {
+    "name": "AwesomeProject_Auth",
+    "full_name": "my-organization/AwesomeProject_Auth",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/authentication.py b/authentication.py\nindex 39a7e1b..d15b473 100644\n--- a/authentication.py\n+++ b/authentication.py\n@@ -25,6 +25,10 @@ def authenticate_user(username, password):\n     # 기존 인증 로직\n     if not user or user.password != hash_password(password):\n         return False\n+\n+    # 이메일 인증 추가\n+    if not verify_email(user.email):\n+        return False\n     return True\n\n+def verify_email(email):\n+    # 이메일 인증 로직 구현 예정\n+    return True\n\ndiff --git a/settings.py b/settings.py\nindex 502ad3e..1c5e473 100644\n--- a/settings.py\n+++ b/settings.py\n@@ -10,6 +10,7 @@\n API_KEY = \"sk_test_51HxTzLJ2b1Bhb0fWv4E23\"  # Example key, please replace\n SECRET_KEY = \"supersecret123\"  # Example secret\n DB_CONNECTION = \"localhost\"\n+CONTACT_PHONE = \"010-1234-5678\"  # 민감 데이터 주의\n CONTACT_EMAIL = \"support@awesomeproject.com\"  # 민감 데이터 주의\n \n SETTINGS_LOADED = True\n"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 7086,
+  "pull_request": {
+    "id": 4383873833,
+    "number": 7086,
+    "state": "opened",
+    "title": "버그 수정: 사용자 프로필 이미지가 업로드되지 않는 문제 해결",
+    "body": "이 PR은 사용자 프로필 이미지를 업로드할 때 발생하던 문제를 수정합니다. 해당 기능은 사용자 프로필 업데이트 페이지에서 이미지를 선택 후 업로드 버튼을 눌렀을 때 서버로 이미지가 전송되지 않는 버그와 관련되어 있습니다. 이 문제는 클라이언트 측에서 FormData 객체에 파일을 제대로 추가하지 못하는 오류에서 비롯되었습니다.\n\n수정 사항은 다음과 같습니다:\n1. FormData 객체에 파일을 올바르게 추가하도록 수정.\n2. 파일 유효성 검사를 추가하여 빈 파일이나 잘못된 파일 유형 업로드를 방지.\n3. API 요청 시 로그를 추가하여 디버깅을 쉽게 할 수 있도록 개선.\n\n테스트를 통해 정상적으로 이미지 업로드가 가능함을 확인했습니다. 하지만 이 PR은 이미지 처리 로직에서 보안 강화를 추가하지 않았기 때문에 추가적인 리뷰가 필요할 수 있습니다. 또한, 이 코드에는 테스트를 위해 의도적으로 하드코딩된 API 키가 포함되어 있으므로 PR 병합 전 반드시 제거해야 합니다.\n\n변경 사항에 대한 리뷰를 부탁드립니다!",
+    "created_at": "2026-02-20T02:57:37.377907+00:00Z",
+    "updated_at": "2026-02-20T02:57:37.377907+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 45,
+    "deletions": 12,
+    "changed_files": 3,
+    "user": {
+      "login": "user_27",
+      "id": 47568,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "9482d562c33b4954a9162e9da8278cc0"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "5d092811865f4aae8075a88ed53fa899"
+    }
+  },
+  "repository": {
+    "name": "user-profile-management",
+    "full_name": "my-organization/user-profile-management",
+    "private": false,
+    "language": "JavaScript",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/src/components/ProfileImageUploader.js b/src/components/ProfileImageUploader.js\nindex 123abc4..567def9 100644\n--- a/src/components/ProfileImageUploader.js\n+++ b/src/components/ProfileImageUploader.js\n@@ -12,6 +12,11 @@ function uploadProfileImage(file) {\n     console.error('File is not valid');\n     return;\n   }\n+\n+  // Temporary hardcoded API key for testing\n+  const API_KEY = '12345-abcde-67890-fghij-12345';  // REMOVE BEFORE MERGE\n+\n+  console.log('Uploading file with API key:', API_KEY);\n\n   const formData = new FormData();\n-  formData.append('image', file);\n+  formData.append('profile_image', file);\n\n   fetch('https://api.example.com/upload', {\n     method: 'POST',\n@@ -22,6 +27,9 @@ function uploadProfileImage(file) {\n       console.log('File uploaded successfully');\n     } else {\n       console.error('File upload failed');\n+      console.log('Debug Info: Server Response:', response.status);\n     }\n   });\n }\n\n+// Example email and phone number accidentally included for testing\n+const testEmail = 'test@example.com';\n+const testPhone = '010-1234-5678';\n"
+  }
+}

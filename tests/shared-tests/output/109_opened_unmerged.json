@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 7918,
+  "pull_request": {
+    "id": 6416388095,
+    "number": 7918,
+    "state": "opened",
+    "title": "사용자 인증 버그 수정 및 보안 문제 해결",
+    "body": "이번 PR에서는 사용자 인증 로직에서 발견된 버그를 수정하고, 일부 보안 취약점을 개선하기 위한 코드를 추가하였습니다. 특정한 상황에서 잘못된 사용자 정보가 인증되는 문제가 있었으며, 이를 해결하기 위해 인증 모듈을 리팩토링하였습니다. 또한 코드 리뷰 중 발견된 하드코딩된 비밀번호 값을 제거하고, 환경 변수를 통해 관리하도록 수정했습니다. 중요한 데이터가 노출되지 않도록 폼 제출 시 민감한 정보를 암호화하는 로직을 추가했습니다. 이런 수정으로 인해 보안성이 대폭 향상되었습니다. 코드 리뷰 부탁드립니다.",
+    "created_at": "2026-02-20T03:00:35.071141+00:00Z",
+    "updated_at": "2026-02-20T03:00:35.071141+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 45,
+    "deletions": 12,
+    "changed_files": 3,
+    "user": {
+      "login": "user_100",
+      "id": 79667,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "74cd6708c5454508b73e02ebd1e1bb8c"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "5ce965b4ef9b4dd4995d5ccaa6b34e14"
+    }
+  },
+  "repository": {
+    "name": "user-auth-system",
+    "full_name": "my-organization/user-auth-system",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/auth.py b/auth.py\nindex e69de29..6b2a1e0 100644\n--- a/auth.py\n+++ b/auth.py\n@@ -1,5 +1,14 @@\ndef authenticate_user(username, password):\n-    # 하드코딩된 비밀번호 제거\n-    if username == 'admin' and password == '12345':\n+    import os\n+    # 환경 변수에서 비밀번호 가져오기\n+    ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')\n+    if username == 'admin' and password == ADMIN_PASSWORD:\n         return True\n     return False\n\n+def encrypt_sensitive_data(data):\n+    # 민감한 데이터 암호화 로직 추가\n+    import hashlib\n+    return hashlib.sha256(data.encode()).hexdigest()\n+\n+API_KEY = 'sk_test_12345abcdef67890'  # 하드코딩된 API 키 제거 필요 경고\n+\n def submit_form(data):\n+    encrypted_data = encrypt_sensitive_data(data)\n     # 폼 제출 로직"
+  }
+}

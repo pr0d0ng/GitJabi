@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 6626,
+  "pull_request": {
+    "id": 7871096908,
+    "number": 6626,
+    "state": "closed",
+    "title": "사용자 정보 노출 문제 수정",
+    "body": "이 PR은 사용자 정보가 로그에 노출될 가능성을 해결하기 위한 수정입니다. 기존 코드에서는 사용자 전화번호와 이메일 주소가 디버그 로그에 출력될 수 있었습니다. 이를 방지하기 위해 디버그 로그에서 민감한 정보를 마스킹하거나 출력하지 않도록 수정하였습니다. 또한 기존에 사용되고 있던 하드코딩된 API 키를 제거하고, 환경 변수를 통해 안전하게 관리할 수 있도록 변경하였습니다. 이런 수정으로 인해 보안 수준이 크게 향상될 것으로 기대됩니다.\n\n변경사항:\n1. 디버깅 코드에서 사용자 전화번호와 이메일 주소가 노출되지 않도록 수정.\n2. 하드코딩된 API 키를 환경 변수로 대체.\n3. 사용되지 않는 불필요한 디버깅 로그 제거.\n\n향후 개선 사항:\n- 로그를 보다 체계적으로 관리하기 위한 로깅 시스템 도입.\n- 민감정보 자동 마스킹 기능 추가.\n\n이번 PR에서 적용된 변경사항의 영향을 신중히 검토해주십시오. 특히, 새로운 보안 메커니즘이 모든 서버 환경에서 제대로 동작하는지 추가 확인이 필요합니다.",
+    "created_at": "2026-02-20T02:56:09.467388+00:00Z",
+    "updated_at": "2026-02-20T02:56:09.467388+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 45,
+    "deletions": 18,
+    "changed_files": 3,
+    "user": {
+      "login": "user_30",
+      "id": 23265,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "5170fd78a6564d11a3b511f802cfdd48"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "6c890e56341e4a7d821378675aef37ea"
+    }
+  },
+  "repository": {
+    "name": "example-company/project-security",
+    "full_name": "my-organization/example-company/project-security",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/logger.py b/app/logger.py\nindex e69de29..b1c3e57 100644\n--- a/app/logger.py\n+++ b/app/logger.py\n@@ -1,5 +1,17 @@\n import logging\n+from os import getenv\n+\n+# Load API key from an environment variable\n+API_KEY = getenv('API_KEY', 'default_key')\n+\n+def mask_sensitive_data(data):\n+    if 'phone_number' in data:\n+        data['phone_number'] = '***-****-****'\n+    if 'email' in data:\n+        data['email'] = '***@***.***'\n+    return data\n \n def log_user_info(user):\n-    logging.debug(f\"User Info: {user}\")\n+    user = mask_sensitive_data(user)\n+    logging.debug(f\"User Info: {user}\")\n\n-diff --git a/config/api_keys.py b/config/api_keys.py\nindex b2c9a41..0000000 100644\n--- a/config/api_keys.py\n+++ b/config/api_keys.py\n@@ -1,3 +1,3 @@\n-API_KEY = \"12345-abcde-67890-fghij\"\n+# API_KEY = \"12345-abcde-67890-fghij\"\n+ # Please use an environment variable to set this value.\n \n diff --git a/tests/test_logger.py b/tests/test_logger.py\nindex f47a2bc..d1123eb 100644\n--- a/tests/test_logger.py\n+++ b/tests/test_logger.py\n@@ -10,7 +10,8 @@ def test_log_user_info():\n     user = {\n         'name': 'John Doe',\n         'email': \"johndoe@example.com\",\n-        'phone_number': \"123-456-7890\"\n+        'phone_number': \"123-456-7890\"\n     }\n+\n+    logger.log_user_info(user)\n     # Assert no sensitive data is exposed in logs\n     assert 'johndoe@example.com' not in caplog.text\n     assert '123-456-7890' not in caplog.text"
+  }
+}

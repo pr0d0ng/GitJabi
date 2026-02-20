@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 4564,
+  "pull_request": {
+    "id": 3969383993,
+    "number": 4564,
+    "state": "closed",
+    "title": "사용자 이메일 노출 문제 수정",
+    "body": "이 Pull Request에서는 사용자 이메일이 의도치 않게 로그에 노출되는 문제를 수정하였습니다. 이메일은 민감 정보로 간주되므로, 이를 삭제 로그에서 제외하고, 민감 정보에 대한 추가 검증 로직을 추가하였습니다. 또한 코드에서 하드코딩된 API 키를 발견하여 제거하고 환경 변수로 대체하였습니다. 수정된 코드가 기존 기능과 호환되는지 테스트를 진행했으며, 추가 보안 검토가 필요할 수 있으니 확인 부탁드립니다.",
+    "created_at": "2026-02-20T03:00:35.755734+00:00Z",
+    "updated_at": "2026-02-20T03:00:35.755734+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 45,
+    "deletions": 32,
+    "changed_files": 4,
+    "user": {
+      "login": "user_94",
+      "id": 65625,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "fbb4942811d54899858c1296023abbde"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "e3bf1d7812714f3685ad80a8fb8de272"
+    }
+  },
+  "repository": {
+    "name": "user-security-system",
+    "full_name": "my-organization/user-security-system",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/user_service.py b/user_service.py\nindex d4e8f7f..bd6812b 100644\n--- a/user_service.py\n+++ b/user_service.py\n@@ -24,7 +24,7 @@ def log_user_action(user_email, action):\n     with open('user_logs.txt', 'a') as log_file:\n         log_file.write(f\"Action by user: {user_email}, Action: {action}\\n\")\n \n-API_KEY = \"12345-ABCDE-SECRET\"\n+import os\n+\n+API_KEY = os.getenv(\"USER_SERVICE_API_KEY\")\n \ndef connect_to_service():\n-    return ThirdPartyService(api_key=API_KEY)\n+    return ThirdPartyService(api_key=os.getenv(\"USER_SERVICE_API_KEY\"))\n \n diff --git a/utils.py b/utils.py\n index a9de8c3..f1a6b47 100644\n --- a/utils.py\n +++ b/utils.py\n @@ -15,11 +15,9 @@ def validate_input(input_data):\n \n def mask_email(email):\n-    if \"@\" in email:\n-        local, domain = email.split(\"@\")\n-        return local[:2] + \"***@\" + domain\n-    return email\n-\n+    try:\n+        local, domain = email.split(\"@\")\n+        return local[:2] + \"***@\" + domain\n+    except ValueError:\n+        return email  # In case of invalid email format\n \n def secure_log(log_message):\n     # Prevent logging sensitive user details\n     filtered_message = log_message.replace(user_email, \"***\")\n     return filtered_message"
+  }
+}

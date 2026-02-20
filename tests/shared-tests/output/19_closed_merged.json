@@ -1,0 +1,51 @@
+{
+  "action": "closed",
+  "number": 7689,
+  "pull_request": {
+    "id": 6050473795,
+    "number": 7689,
+    "state": "closed",
+    "title": "사용자 정보 수정 API 버그 수정",
+    "body": "이 PR은 사용자 정보 수정 API에서 발생한 치명적인 버그를 수정하기 위한 것입니다. 특정 케이스에서, 유저 ID가 올바르게 검증되지 않아 다른 사용자의 정보를 덮어쓸 가능성이 있는 보안 문제가 발견되었습니다. 해당 문제를 해결하면서 코드 품질을 개선하기 위해 일부 리팩토링도 진행하였습니다. 추가적으로, 간단한 유닛 테스트를 추가하여 향후 유사 문제가 발생하지 않도록 대비했습니다. 하지만 코드 리뷰를 통해 놓친 부분이 있다면 피드백 부탁드립니다. 특히 몇몇 API 호출 부분에서 보안 강화가 필요한지 확인 부탁드립니다. 감사합니다.",
+    "created_at": "2026-02-20T02:56:03.620619+00:00Z",
+    "updated_at": "2026-02-20T02:56:03.620619+00:00Z",
+    "merged_at": "2026-02-19T17:15:55Z",
+    "merged": true,
+    "merged_by": {
+      "login": "maintainer_2",
+      "id": 9663,
+      "type": "User",
+      "site_admin": false
+    },
+    "draft": false,
+    "mergeable_state": "clean",
+    "commits": 1,
+    "additions": 154,
+    "deletions": 89,
+    "changed_files": 5,
+    "user": {
+      "login": "user_57",
+      "id": 83625,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "f3de9d06a6c543dc9bd599d1b2e04320"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "24efde6912144f8fab881ea7a0198349"
+    }
+  },
+  "repository": {
+    "name": "company/user-api",
+    "full_name": "my-organization/company/user-api",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/api/user.py b/api/user.py\nindex 39a2d9a..f47e3dc 100644\n--- a/api/user.py\n+++ b/api/user.py\n@@ -25,7 +25,7 @@ def update_user_info(user_id, data):\n     # Check user permissions\n-    if user_id:\n+    if not isinstance(user_id, int) or user_id < 0:\n         raise ValueError(\"Invalid user ID\")\n\n     # Directly overwriting fields (security issue)\n-    user['email'] = data['email']\n+    user['email'] = sanitize_input(data['email'])\n\n+    # REMOVE HARDCODED SECRET\n+    api_key = \"sk_test_51H8XXxyJ8m4y...\"\n+    logger.warning(f\"Sensitive API key exposed: {api_key}\")\n\n     # Save user data securely\n-    save_user_to_db(user)\n+    save_user_to_db(user, validate=True)\n\n+    # ADD UNIT TEST\n+    assert validate_user_id(user_id), \"User ID validation failed\"\n\n def sanitize_input(value):\n     if not isinstance(value, str):\n         raise ValueError(\"Input must be a string\")\n     return value.strip()\n"
+  }
+}

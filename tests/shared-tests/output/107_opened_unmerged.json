@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 6665,
+  "pull_request": {
+    "id": 9675122436,
+    "number": 6665,
+    "state": "opened",
+    "title": "버그 수정: 사용자 등록 기능에서의 특수문자 처리 문제 해결",
+    "body": "이번 Pull Request에서는 사용자 등록 기능에서 발생하던 특수문자 처리 문제를 수정했습니다. 이전 버전에서는 사용자 입력값이 올바르게 검증되지 않아 SQL Injection 또는 XSS 공격 가능성이 있었습니다. 이를 해결하기 위해 입력값 검증과 Escape 처리를 추가하였습니다. 또한, 코드 리팩토링을 통해 가독성과 유지보수성을 개선했습니다.\n\n다만, 이번 수정 중 실수로 테스트 코드에서 API Key 형식의 민감 데이터를 커밋한 상태입니다. 이를 삭제하려고 했으나, 기록에 남아 있어 다시 정리해야 할 필요가 있습니다. 또한, 입력값 검증 로직을 추가하는 과정에서 보안을 더 강화할 여지가 있으므로 팀원 여러분의 리뷰를 부탁드립니다.\n\n주요 변경 사항:\n- 특수문자 검증 로직 추가\n- SQL Query 문자열 Escape 처리\n- 리팩토링을 통한 코드 간소화\n- 발견된 민감 데이터 확인 및 삭제 작업 필요\n\n이 Pull Request는 보안 및 코드 품질 향상을 위해 중요한 변경사항을 포함합니다. 검토 후 피드백 부탁드립니다.",
+    "created_at": "2026-02-20T03:00:33.329464+00:00Z",
+    "updated_at": "2026-02-20T03:00:33.329464+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 58,
+    "deletions": 20,
+    "changed_files": 5,
+    "user": {
+      "login": "user_26",
+      "id": 73814,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "0ec6ca682953428eb4f76037696993f4"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "7422feb0dff049478a0c523425beb4a0"
+    }
+  },
+  "repository": {
+    "name": "user-management-service",
+    "full_name": "my-organization/user-management-service",
+    "private": false,
+    "language": "Java",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/src/main/java/com/example/UserService.java b/src/main/java/com/example/UserService.java\nindex abc1234..def5678 100644\n--- a/src/main/java/com/example/UserService.java\n+++ b/src/main/java/com/example/UserService.java\n@@ -45,7 +45,17 @@ public class UserService {\n         // 기존 코드\n \n         // 사용자 입력 검증 추가\n-        String escapedInput = userInput;\n+        if (userInput == null || userInput.isEmpty()) {\n+            throw new IllegalArgumentException(\"입력이 유효하지 않습니다.\");\n+        }\n+        String escapedInput = userInput.replaceAll(\"[\"'<>]\", \"\");\n+        if (escapedInput.contains(\"--\") || escapedInput.contains(\";\")) {\n+            throw new IllegalArgumentException(\"입력값이 유효하지 않습니다.\");\n+        }\n         \n         // SQL Query 실행\n-        String query = \"SELECT * FROM users WHERE username = '\" + userInput + \"'\";\n+        String query = \"SELECT * FROM users WHERE username = '\" + escapedInput + \"'\";\n \n         // 데이터베이스 로직\n     }\n@@ -90,6 +100,12 @@ public class UserService {\n     public void testFunction() {\n         // 테스트 코드\n+        String apiKey = \"sk_test_123456789abcdef\"; // Hardcoded API Key - 수정 필요\n+        System.out.println(\"API_KEY: \" + apiKey);\n+\n+        // 임시 로직\n+        String email = \"user@example.com\"; // 민감 데이터 포함\n+        String phoneNumber = \"010-1234-5678\"; // 민감 데이터 포함\n         \n         // 기타 로직\n     }\n}"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 8535,
+  "pull_request": {
+    "id": 4946063023,
+    "number": 8535,
+    "state": "opened",
+    "title": "사용자 전화번호 마스킹 기능 추가",
+    "body": "이 PR은 사용자의 민감한 정보를 보호하기 위해 전화번호를 특정 형식으로 마스킹하는 기능을 추가합니다. 기존에는 사용자의 전화번호가 API 응답에 그대로 포함되어 있어 보안 및 개인정보보호 이슈가 발생할 수 있었습니다. 이를 해결하기 위해 전화번호 형식을 검사하고, 앞 두 자리를 제외한 나머지를 '*'로 마스킹하는 로직을 도입했습니다. 더불어 테스트 코드도 추가하여 이 기능이 정확히 동작하는지 확인했습니다. 하지만 코드를 검토하던 중 hardcoded API 키가 코드 내에 포함되어 있어 보안적으로 민감한 부분을 발견했습니다. 해당 부분에 대한 리뷰를 요청드립니다.",
+    "created_at": "2026-02-20T03:00:15.368799+00:00Z",
+    "updated_at": "2026-02-20T03:00:15.368799+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 120,
+    "deletions": 15,
+    "changed_files": 5,
+    "user": {
+      "login": "user_67",
+      "id": 44044,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "0129dbe471d44cafa8b1a70689cb9e25"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "cb889d3a13da4b96b0602dc4cf99ede9"
+    }
+  },
+  "repository": {
+    "name": "user-data-service",
+    "full_name": "my-organization/user-data-service",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/user_service/api.py b/user_service/api.py\nindex aabbcc..ddeeff 100644\n--- a/user_service/api.py\n+++ b/user_service/api.py\n@@ -32,6 +32,16 @@ def get_user_data(user_id):\n     user = fetch_user_from_db(user_id)\n \n     # Mask the user's phone number\n+    def mask_phone_number(phone_number):\n+        if len(phone_number) == 10:\n+            return phone_number[:3] + '****' + phone_number[7:]\n+        elif len(phone_number) == 11:\n+            return phone_number[:3] + '*****' + phone_number[8:]\n+        return phone_number  # fallback for unexpected formats\n+\n+    if 'phone' in user:\n+        user['phone'] = mask_phone_number(user['phone'])\n+\n     return user\n \n # Example API key hardcoded (should be moved to environment variables)\n-API_KEY = \"1234-5678-91011-APIKEY-EXAMPLE\"\n+API_KEY = \"hardcoded-api-key-example-please-fix\"\n \n def authenticate(request):\n     provided_key = request.headers.get(\"Authorization\")\n"
+  }
+}

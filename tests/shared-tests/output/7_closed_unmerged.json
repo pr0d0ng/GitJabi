@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 3077,
+  "pull_request": {
+    "id": 8727517991,
+    "number": 3077,
+    "state": "closed",
+    "title": "API 키 노출 문제 수정",
+    "body": "이번 풀 리퀘스트는 API 키가 코드 내에 하드코딩된 문제를 포함한 보안 관련 수정을 다루고 있습니다. 해당 키는 외부에서 접근이 가능할 위험성이 있어 민감한 데이터를 안전하게 보호하기 위한 조치를 추가하였습니다. 또한 일부 코드 정리를 통해 보안을 강화하였습니다. 주요 변경 사항으로는 새로 생성된 환경 변수 파일을 통해 API 키를 관리하도록 개선했습니다. 앞으로는 민감한 정보가 노출되지 않고, 적절한 환경 설정을 통해 개발 및 운영 안정성을 유지할 수 있습니다. 추가적으로, 불필요한 로그 메시지와 파일도 제거하여 코드 품질을 향상시켰습니다. 코드 수정으로 인해 앱의 보안성이 향상되었으며, 실행에 대한 테스트도 포함되었습니다. 단, 수정 사항이 포함된 PR은 즉시 닫혔으며, 운영 환경에서의 추가 조치가 필요할 것으로 보입니다.",
+    "created_at": "2026-02-20T02:55:49.961897+00:00Z",
+    "updated_at": "2026-02-20T02:55:49.961897+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 72,
+    "deletions": 48,
+    "changed_files": 5,
+    "user": {
+      "login": "user_49",
+      "id": 55421,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "0dfa08c8cff5468280e81299c561cf08"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "2d425fdf056843569443253e1fe43e0a"
+    }
+  },
+  "repository": {
+    "name": "secure-app-service",
+    "full_name": "my-organization/secure-app-service",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/main.py b/app/main.py\nindex 80f1c23..3a76b12 100644\n--- a/app/main.py\n+++ b/app/main.py\n@@ -5,7 +5,10 @@ import os\n\n def connect_to_service():\n     # 기존 하드코딩된 API 키 제거\n-    api_key = \"12345-ABCDE-SECRET-HARDCODED\"\n+    api_key = os.environ.get(\"SERVICE_API_KEY\")\n+    if not api_key:\n+        raise EnvironmentError(\"API 키가 환경 변수에 정의되어있지 않습니다.\")\n+\n     # 일부 로깅 제거\n     print(\"서비스에 연결 중...\")\n     return True\n\ndiff --git a/app/.env.example b/app/.env.example\nnew file mode 100644\n--- /dev/null\n+++ b/app/.env.example\n@@ -0,0 +1,3 @@\n+# 환경 변수 예제 파일\n+SERVICE_API_KEY=your-api-key-here\n+\n\ndiff --git a/app/utils/logger.py b/app/utils/logger.py\nindex 546ac11..7b2a788 100644\n--- a/app/utils/logger.py\n+++ b/app/utils/logger.py\n@@ -23,8 +23,6 @@ def format_log_message(message: str) -> str:\n     # 기존 메시지 조정\n     log_message = message.upper()\n\n-    # 민감한 정보 로그 제거\n-    print(f\"로그 메시지 출력: {log_message}\")\n     return log_message\n\ndiff --git a/tests/test_main.py b/tests/test_main.py\nindex 9f32a7c..b54c916 100644\n--- a/tests/test_main.py\n+++ b/tests/test_main.py\n@@ -8,6 +8,12 @@ def test_connect_to_service():\n     with patch(\"os.environ.get\") as mock_env:\n         mock_env.return_value = \"test-api-key\"\n         result = connect_to_service()\n+        assert result is True\n+\n+def test_missing_api_key():\n+    with patch(\"os.environ.get\", return_value=None):\n+        with pytest.raises(EnvironmentError):\n+            connect_to_service()\n\ndiff --git a/docs/security_guidelines.md b/docs/security_guidelines.md\nnew file mode 100644\n--- /dev/null\n+++ b/docs/security_guidelines.md\n@@ -0,0 +1,10 @@\n+# 보안 가이드라인\n+\n+## 민감한 정보 관리\n+- 환경 변수를 통해 API 키 및 비밀번호를 관리합니다.\n+- 코드 내 하드코딩된 키는 제거해야 합니다.\n+\n+## 테스트\n+- 모든 보안 관련 코드 변경 사항은 테스트가 필요합니다.\n+- 테스트 케이스를 추가하여 보안을 검증하세요.\n+"
+  }
+}

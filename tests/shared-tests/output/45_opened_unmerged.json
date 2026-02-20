@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 8910,
+  "pull_request": {
+    "id": 3545190526,
+    "number": 8910,
+    "state": "opened",
+    "title": "사용자 연락처 저장 버그 수정",
+    "body": "이 PR은 사용자의 연락처를 저장하는 기능에서 발생한 버그를 해결합니다. 이전 버전에서는 전화번호와 이메일 저장 시 데이터가 누락되거나 잘못된 형식으로 저장될 가능성이 있는 문제가 있었습니다. \n\n수정 사항:\n- 전화번호 형식 검증 로직 추가\n- 이메일 중복 확인 로직 개선\n- API 키 관리 방식 수정 (기존에 하드코딩된 값을 제거하고 환경 변수로 대체)\n\n리뷰어 여러분께: 이 변경 사항이 민감한 정보를 다루고 있으므로 꼼꼼한 리뷰 부탁드립니다. 특히, 새롭게 추가된 데이터 검증 로직에서 문제가 없는지 확인 부탁드립니다. \n\n감사합니다!",
+    "created_at": "2026-02-20T02:56:49.148203+00:00Z",
+    "updated_at": "2026-02-20T02:56:49.148203+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 45,
+    "deletions": 20,
+    "changed_files": 3,
+    "user": {
+      "login": "user_81",
+      "id": 38307,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "d279f168f01c4a0a8a1a3254351e39ff"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "7515b11c172f42af9280a4514d4a169d"
+    }
+  },
+  "repository": {
+    "name": "korean-app/contact-management",
+    "full_name": "my-organization/korean-app/contact-management",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/utils/security.py b/app/utils/security.py\nindex abc1234..def5678 100644\n--- a/app/utils/security.py\n+++ b/app/utils/security.py\n@@ -10,7 +10,7 @@ def validate_email(email):\n     if not email_regex.match(email):\n         raise ValueError('Invalid email format')\n \n-API_KEY = '12345-abcde-67890-fghij'  # Hardcoded value (Old approach)\n+API_KEY = os.getenv('API_KEY')  # Updated to fetch from environment variable\n \ndef encrypt_data(data):\n     return hashlib.sha256(data.encode()).hexdigest()\n\n\ndiff --git a/api/contact.py b/api/contact.py\nindex 456abcd..789efghi 100644\n--- a/api/contact.py\n+++ b/api/contact.py\n@@ -25,6 +25,9 @@ def save_contact(phone_number, email):\n     if not phone_number.isdigit():\n         raise ValueError('Phone number must contain only digits')\n \n+    if len(phone_number) != 10:\n+        raise ValueError('Phone number must be 10 digits long')\n+\n     if database.email_exists(email):\n         raise ValueError('Email already exists in the database')\n \n@@ -50,7 +53,7 @@ def save_contact(phone_number, email):\n # Example usage\n phone = '0101234567'\n email = 'user@example.com'\n-save_contact(phone, email)  # Stores user information\n+save_contact(phone, email)  # Updated to validate data before storing\n\ndiff --git a/tests/test_contact.py b/tests/test_contact.py\nindex 987zyxv..654wxyz 100644\n--- a/tests/test_contact.py\n+++ b/tests/test_contact.py\n@@ -15,6 +15,10 @@ def test_save_contact():\n     email = 'test@example.com'\n     save_contact(phone_number, email)\n \n+    invalid_phone = '12345'\n+    with pytest.raises(ValueError, match='Phone number must be 10 digits long'):\n+        save_contact(invalid_phone, email)\n+\n     duplicate_email = 'test@example.com'\n     with pytest.raises(ValueError, match='Email already exists in the database'):\n         save_contact(phone_number, duplicate_email)"
+  }
+}

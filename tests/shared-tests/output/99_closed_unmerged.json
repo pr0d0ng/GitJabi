@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 571,
+  "pull_request": {
+    "id": 4102339340,
+    "number": 571,
+    "state": "closed",
+    "title": "불필요한 API 키 및 보안 취약점 제거",
+    "body": "이 PR은 코드베이스에서 하드코딩된 API 키와 이메일 정보를 제거하려는 시도입니다. 또한, 일부 보안 관련 문제를 해결하기 위해 코드 변경 사항이 포함되어 있습니다. 초기 구현 단계에서 필요로 했던 데이터가 여전히 코드에 남아 있었고, 이는 보안 리스크를 증가시킬 수 있었습니다. 추가적으로, 특정 함수에서 파라미터 검증이 제대로 이루어지지 않아 악의적인 사용자가 이를 악용할 가능성도 있었습니다. 변경 사항은 기존 기능에 최소한의 영향을 미치도록 설계되었으며, 주요 구동 로직에는 영향을 미치지 않도록 수정하였습니다. 앞으로 보안 및 민감한 데이터 처리를 더욱 신중히 할 예정입니다.",
+    "created_at": "2026-02-20T03:00:14.210454+00:00Z",
+    "updated_at": "2026-02-20T03:00:14.210454+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 25,
+    "deletions": 18,
+    "changed_files": 3,
+    "user": {
+      "login": "user_66",
+      "id": 56171,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "15f94e7035d34049a47c7474f6d6afcc"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "dfe475c049354a8a9667e8a729675706"
+    }
+  },
+  "repository": {
+    "name": "team-project/security-enhancements",
+    "full_name": "my-organization/team-project/security-enhancements",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/config.py b/app/config.py\nindex abc1234..def5678 100644\n--- a/app/config.py\n+++ b/app/config.py\n@@ -2,7 +2,7 @@\n class Config:\n     DEBUG = False\n     TESTING = False\n-    API_KEY = \"12345-abcde-67890-fghij\"\n+    API_KEY = os.getenv(\"API_KEY\")\n     DATABASE_URI = \"postgresql://user:password@localhost/db\"\n\ndiff --git a/app/routes.py b/app/routes.py\nindex xyz123..uvw456 100644\n--- a/app/routes.py\n+++ b/app/routes.py\n@@ -10,9 +10,12 @@ from flask import Flask, request, jsonify\n app = Flask(__name__)\n\n @app.route('/login', methods=['POST'])\n def login():\n-    email = request.form['email']\n-    password = request.form['password']\n-    if '@' not in email:\n+    email = request.form.get('email')\n+    password = request.form.get('password')\n+    if not email or '@' not in email:\n         return jsonify({'error': 'Invalid email address'}), 400\n+    if not password:\n+        return jsonify({'error': 'Password is required'}), 400\n\n     # Authentication logic here\n     return jsonify({'message': 'Logged in successfully'})\n\ndiff --git a/app/__init__.py b/app/__init__.py\nindex 111aaa..222bbb 100644\n--- a/app/__init__.py\n+++ b/app/__init__.py\n@@ -1,4 +1,4 @@\n-import flask\n+from flask import Flask\n\n app = Flask(__name__)\n\n-DEBUG_EMAIL = \"test@example.com\"\n+DEBUG_EMAIL = os.getenv(\"DEBUG_EMAIL\")"
+  }
+}

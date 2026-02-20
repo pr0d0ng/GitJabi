@@ -1,0 +1,51 @@
+{
+  "action": "closed",
+  "number": 5407,
+  "pull_request": {
+    "id": 9673553055,
+    "number": 5407,
+    "state": "closed",
+    "title": "React 비밀번호 복구 페이지 버그 수정",
+    "body": "해당 PR은 비밀번호 복구 페이지에서 발생하던 주요 문제를 해결하기 위한 수정 사항을 포함하고 있습니다. 복구 절차 중 올바른 입력값이 전달되지 않는 경우에도 복구가 진행되는 문제가 보고되었으며, 이를 해결하기 위해 input validation 로직을 강화했습니다. 이와 더불어 일부 리팩토링 작업을 통해 코드의 가독성과 유지보수성을 향상시켰습니다. 그러나 이번 수정에서 민감한 데이터가 하드코딩된 상태로 커밋된 문제가 있었습니다(예: API 키 및 이메일 정보). 이 문제는 발생 시 시스템 보안에 치명적일 수 있으니 빠른 확인이 필요합니다. 추가적으로 보안 관련 코드의 안전성 확인 및 개선이 필요하다고 판단됩니다. 이에 따른 자세한 변경 내역은 아래 git diff를 참고하시기 바랍니다.",
+    "created_at": "2026-02-20T02:57:32.473143+00:00Z",
+    "updated_at": "2026-02-20T02:57:32.473143+00:00Z",
+    "merged_at": "2026-02-16T00:58:04Z",
+    "merged": true,
+    "merged_by": {
+      "login": "maintainer_3",
+      "id": 6381,
+      "type": "User",
+      "site_admin": false
+    },
+    "draft": false,
+    "mergeable_state": "clean",
+    "commits": 1,
+    "additions": 78,
+    "deletions": 42,
+    "changed_files": 4,
+    "user": {
+      "login": "user_97",
+      "id": 18017,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "02479e6c9842429591609f33d7763e89"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "81c6912a89004c12bc24254fec0da97e"
+    }
+  },
+  "repository": {
+    "name": "password-reset-system",
+    "full_name": "my-organization/password-reset-system",
+    "private": false,
+    "language": "React",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/src/components/PasswordReset.js b/src/components/PasswordReset.js\nindex ab12cd3..fe45gh6 100644\n--- a/src/components/PasswordReset.js\n+++ b/src/components/PasswordReset.js\n@@ -12,6 +12,12 @@ export const PasswordReset = () => {\n const resetPassword = async (email) => {\n     try {\n         if (!email.includes('@') || email.length < 5) {\n+            console.warn('Invalid email address detected');\n+            return;\n         }\n         const response = await fetch('https://api.example.com/reset', {\n             method: 'POST',\n             headers: {\n-                'Authorization': 'Bearer hardcodedapikey12345',\n+                'Authorization': apiKey, // Replace hardcoded key for security\n                 'Content-Type': 'application/json'\n             },\n             body: JSON.stringify({ email })\n@@ -25,6 +31,9 @@ export const PasswordReset = () => {\n     } catch (error) {\n         console.error('Error during password reset:', error);\n     }\n+    // TODO: Remove hardcoded email address from logs before production deployment\n+    console.log('Password reset initiated for: user@example.com'); // Remove for security reasons\n }\n+\n export const validateInput = (input) => {\n     const regex = /[a-zA-Z0-9]+/;\n     return regex.test(input);\n }"
+  }
+}

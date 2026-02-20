@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 9920,
+  "pull_request": {
+    "id": 8525594095,
+    "number": 9920,
+    "state": "closed",
+    "title": "불필요한 디버그 코드 삭제 및 민감 데이터 제거",
+    "body": "이 PR에서는 불필요한 디버그 코드와 잘못 포함된 민감 데이터를 제거했습니다. 특정 파일에서 하드코딩된 API 키와 이메일 주소가 노출되어 있었으며, 이는 보안상 문제가 될 수 있는 부분입니다. 해당 데이터를 모두 제거하고, 필요한 경우 환경 변수를 사용하도록 권장합니다. 또한 코드에서 보안상의 취약점이 될 수 있는 코드 예제가 발견되어 이를 수정하였습니다. 이 변경은 기존 기능에 영향을 미치지 않으며, 코드의 보안성을 강화하는 데 중점을 두었습니다. 추가적으로 일부 주석 작성 및 리팩토링 작업이 병행되었습니다. 팀원분들의 빠른 리뷰를 부탁드립니다.",
+    "created_at": "2026-02-20T02:57:41.084915+00:00Z",
+    "updated_at": "2026-02-20T02:57:41.084915+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 42,
+    "deletions": 15,
+    "changed_files": 3,
+    "user": {
+      "login": "user_80",
+      "id": 67940,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "073e53a6369f492e88e15996e146d1ec"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "1bd5ec73aeb344d393923cd163d0e471"
+    }
+  },
+  "repository": {
+    "name": "sample-project",
+    "full_name": "my-organization/sample-project",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/config.py b/config.py\nindex f1b2d3c..e4f5g6h 100644\n--- a/config.py\n+++ b/config.py\n@@ -1,5 +1,5 @@\n-API_KEY = \"12345-ABCDE-SECRET-KEY\"\n-email = \"example@example.com\"\n+import os\n+\n+# Load sensitive configurations from environment variables\n+API_KEY = os.getenv(\"API_KEY\")\n+\n-DEBUG = True\n+DEBUG = False\n\n--- a/app.py b/app.py\n@@ -12,8 +12,6 @@ def process_data(data):\n-  phone_number = \"010-1234-5678\"  # 하드코딩된 전화번호 제거\n-  email_address = \"test@domain.com\" # 이메일 주소 제거\n+  # Removed hardcoded sensitive information.\n\n-  if DEBUG:\n+  if os.getenv(\"DEBUG_MODE\"):\n     print(\"Debug mode enabled\")\n--- a/README.md b/README.md\n@@ -25,6 +25,8 @@\n+### 주의\n+이 프로젝트는 환경 변수에서 API 키 및 기타 민감한 정보를 로드합니다. 환경 변수를 설정하기 전에 .env 파일을 업데이트하십시오.\n"
+  }
+}

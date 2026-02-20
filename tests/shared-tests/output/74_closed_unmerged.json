@@ -1,0 +1,46 @@
+{
+  "action": "closed",
+  "number": 3066,
+  "pull_request": {
+    "id": 3465856233,
+    "number": 3066,
+    "state": "closed",
+    "title": "로그인 버그 수정 중 민감 정보 유출 방지",
+    "body": "로그인과 관련된 버그를 수정하는 중, 실수로 일부 민감한 데이터가 코드에 포함되었습니다. 인증 관련 키와 관리자 이메일 주소가 노출되지 않도록 조치했습니다. 이미 노출된 민감 데이터를 제거하고, 코드 안전성을 강화했습니다. 향후 이러한 일이 반복되지 않도록 체크리스트를 업데이트했으며, 안전한 코드 리뷰 프로세스를 마련하였습니다. 또한 보안 관련 설정을 강화해 더 이상 민감한 정보가 저장되지 않도록 수정했습니다. 암호화된 키 처리를 적용했으며, 하드코딩된 민감 데이터들은 수정되었습니다.",
+    "created_at": "2026-02-20T02:59:33.915766+00:00Z",
+    "updated_at": "2026-02-20T02:59:33.915766+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 45,
+    "deletions": 23,
+    "changed_files": 3,
+    "user": {
+      "login": "user_87",
+      "id": 46305,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "99cfa72f06b141c6babc22d2f40aad40"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "12ec33f9a8c8435eb581414636cb47b0"
+    }
+  },
+  "repository": {
+    "name": "ecommerce-project",
+    "full_name": "my-organization/ecommerce-project",
+    "private": false,
+    "language": "JavaScript",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/src/config.js b/src/config.js\nindex abc1234..def5678 100644\n--- a/src/config.js\n+++ b/src/config.js\n@@ -5,7 +5,7 @@\n const config = {\n-  adminEmail: 'admin@example.com',\n-  apiKey: '12345-abcde-67890-fghij', // hardcoded API key\n+  adminEmail: process.env.ADMIN_EMAIL,\n+  apiKey: process.env.API_KEY, // moved to environment variables\n};\n\nexport default config;\n\ndiff --git a/src/auth.js b/src/auth.js\nindex xyz890..uvw345 100644\n--- a/src/auth.js\n+++ b/src/auth.js\n@@ -10,10 +10,8 @@\n-  if (password === 'password123') { // insecure hardcoded password\n+  if (password === process.env.ADMIN_PASSWORD) {\n     // login success\n   }\n\n-// removed hardcoded test phone number\n-const supportPhoneNumber = '010-1234-5678';\n+const supportPhoneNumber = process.env.SUPPORT_PHONE_NUMBER;\n \n// updated email regex validation\n+const validateEmail = (email) => /^(\\w+)(\\.\\w+)*@(\\w+\\.)*(\\w+)\\.\\w{2,3}$/.test(email);"
+  }
+}

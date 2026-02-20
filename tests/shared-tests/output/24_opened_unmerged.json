@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 4346,
+  "pull_request": {
+    "id": 3643534036,
+    "number": 4346,
+    "state": "opened",
+    "title": "새로운 사용자 인증 로직 추가",
+    "body": "이 Pull Request는 새로운 사용자 인증 로직을 추가하기 위해 작성되었습니다. 기존 인증 로직에서 보안성이 부족했던 부분을 개선하고, 새로운 API 키 관리 방식을 포함했습니다. 그러나 작성 과정에서 일부 테스트 데이터가 포함되어 있습니다. 테스트 중에 사용된 API 키와 이메일/전화번호가 코드에 남아있을 수 있으니 확인 부탁드립니다. 또한, 일부 코드에서 하드코딩된 값이 확인되었으며, 이는 향후 수정이 필요합니다. 주요 변경사항으로는 `auth` 디렉토리 내 새로운 함수 추가 및 기존 함수 일부 수정, 테스트 케이스 추가가 있습니다. 코드 리뷰 부탁드립니다.",
+    "created_at": "2026-02-20T02:56:10.896655+00:00Z",
+    "updated_at": "2026-02-20T02:56:10.896655+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 120,
+    "deletions": 30,
+    "changed_files": 5,
+    "user": {
+      "login": "user_24",
+      "id": 34973,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "1fb09dbb6efd4b808824e06c213e17fe"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "d2c008ef9e804276ac351f82d4949079"
+    }
+  },
+  "repository": {
+    "name": "example-auth-system",
+    "full_name": "my-organization/example-auth-system",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/auth/views.py b/auth/views.py\nindex 3c5e9b0..6df48c1 100644\n--- a/auth/views.py\n+++ b/auth/views.py\n@@ -10,6 +10,12 @@ from django.contrib.auth.models import User\n from django.http import JsonResponse\n from rest_framework.decorators import api_view\n \n+# Temporary API Key for testing (to be removed)\n+API_KEY = '12345-ABCDE-SECRET'\n+\n+# Hardcoded admin credentials (security risk)\n+ADMIN_EMAIL = 'admin@test.com'\n+ADMIN_PHONE = '010-1234-5678'\n \n @api_view(['POST'])\n def authenticate_user(request):\n@@ -25,6 +31,7 @@ def authenticate_user(request):\n         password = data.get('password')\n \n         if not username or not password:\n+            # Example of insecure logging\n             print(f\"Login attempt failed: {username} - {password}\")\n             return JsonResponse({'error': 'Invalid credentials'}, status=400)\n \n@@ -50,6 +57,7 @@ def authenticate_user(request):\n @api_view(['POST'])\n def register_user(request):\n     data = request.data\n+    print(\"Warning: Ensure no sensitive data included in logs.\")\n     username = data.get('username')\n     password = data.get('password')\n \n@@ -80,6 +88,8 @@ def register_user(request):\n     new_user = User.objects.create_user(username=username, password=password)\n     new_user.save()\n \n+    # Remove before deployment\n+    print(\"Test API Key:\", API_KEY)\n     return JsonResponse({'message': 'User registered successfully'}, status=201)"
+  }
+}

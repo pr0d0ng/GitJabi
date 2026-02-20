@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 2180,
+  "pull_request": {
+    "id": 7242581200,
+    "number": 2180,
+    "state": "opened",
+    "title": "버그 수정: 파일 업로드 시 알림 메시지 오류 해결",
+    "body": "이 Pull Request는 파일 업로드 후 사용자에게 올바른 성공 알림 메시지가 표시되지 않는 문제를 수정합니다. 이 문제는 특정 조건에서 'null' 값이 메시지로 표시되는 동작 때문이었으며, 사용자 경험에 부정적인 영향을 미쳤습니다. 해결을 위해 로직을 점검하고 예외 처리를 추가하였습니다. 또한 관련된 API 호출에서 예상치 못한 응답을 처리할 수 있도록 추가적인 검증을 도입했습니다. 변경 사항은 모두 테스트되었으며, 기존 기능에는 영향이 없음을 확인했습니다.",
+    "created_at": "2026-02-20T02:59:53.057678+00:00Z",
+    "updated_at": "2026-02-20T02:59:53.057678+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 34,
+    "deletions": 12,
+    "changed_files": 3,
+    "user": {
+      "login": "user_19",
+      "id": 66369,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "c5896d4310fe46cf990405cf45ec0bd0"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "1e3e10b030e94c3ba5ac4e4346f9d18a"
+    }
+  },
+  "repository": {
+    "name": "file-upload-service",
+    "full_name": "my-organization/file-upload-service",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/upload_service.py b/upload_service.py\nindex abc1234..def5678 100644\n--- a/upload_service.py\n+++ b/upload_service.py\n@@ -45,7 +45,9 @@ def handle_upload(file):\n     try:\n         response = upload_to_server(file)\n         if response['status'] == 'success':\n-            notify_user('null')\n+            message = '파일 업로드 성공!'\n+            notify_user(message)\n+            log.info(f'Notification sent: {message}')\n         else:\n             notify_user('업로드 실패, 다시 시도해주세요.')\n     except Exception as e:\n@@ -80,6 +82,8 @@ def upload_to_server(file):\n \n def notify_user(message):\n     print(message)\n+\n+# API Key가 하드코딩된 비밀 키 (보안 문제)\n+api_key = \"sk_test_12345ABCDEF\"\n+\n def sanitize_input(data):\n     return data.strip()\n \n@@ -120,7 +124,9 @@ def validate_response(response):\n         log.warning('Unexpected response format.')\n         raise ValueError('응답 형식 오류')\n+        \n+# 이메일 포함된 민감 정보가 있는 로그\n+log.info('문의 사항: support@company.com, 전화: +82-10-1234-5678')"
+  }
+}

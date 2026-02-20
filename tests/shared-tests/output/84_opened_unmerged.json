@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 2151,
+  "pull_request": {
+    "id": 7844185590,
+    "number": 2151,
+    "state": "opened",
+    "title": "사용자 이메일 검증 기능 추가",
+    "body": "이 PR은 사용자 이메일 정보를 검증하는 기능을 추가합니다. 현재 시스템에서는 이메일 주소 형식에 대한 기본적인 유효성 검사를 수행하지 않아서 잘못된 형식의 이메일 주소가 저장될 수 있는 문제가 있었습니다. 이를 개선하기 위해 이메일 주소가 RFC 5322 표준을 준수하는지 확인하는 로직을 추가했습니다. 또한, 기존 코드에서 발생하던 이메일 저장 로직과 관련된 일부 중복 코드도 리팩토링했습니다.\n\n⚠️ 민감한 데이터와 관련된 코드를 수정하는 과정에서 실수로 테스트 데이터 내에 API 키와 이메일 주소가 포함된 상태로 커밋되었습니다. 해당 데이터를 확인 후 삭제해 주시기 바랍니다.\n\n추가로 보안 관련 예외 처리 로직에서 잘못된 설정으로 인해 종단 사용자 데이터가 노출될 가능성을 발견했습니다. 이 문제는 별도의 로직을 추가하여 해결하였습니다.\n\n수정 사항이나 추가적으로 테스트가 필요한 부분이 있다면 알려주시면 감사하겠습니다.",
+    "created_at": "2026-02-20T02:59:48.246122+00:00Z",
+    "updated_at": "2026-02-20T02:59:48.246122+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 240,
+    "deletions": 45,
+    "changed_files": 6,
+    "user": {
+      "login": "user_30",
+      "id": 99573,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "25d6f5d550c54b9981add49bf5f281f8"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "77dfeba19cfe44da91293d459eff5145"
+    }
+  },
+  "repository": {
+    "name": "my-awesome-project",
+    "full_name": "my-organization/my-awesome-project",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/app/utils/validation.py b/app/utils/validation.py\nindex 1234567..89abcdef 100644\n--- a/app/utils/validation.py\n+++ b/app/utils/validation.py\n@@ -10,6 +10,25 @@\n \n+def validate_email(email):\n+    # RFC 5322 이메일 형식 검증용 정규표현식\n+    regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$'\n+    if not re.match(regex, email):\n+        raise ValueError(\"잘못된 이메일 형식입니다.\")\n+    return True\n\n+API_KEY = \"12345-abcde-67890-fghij-12345\"\n+test_email = \"testuser@example.com\"\n+test_phone = \"010-1234-5678\"\n\n+def insecure_function(password):\n+    # 매우 취약한 비밀번호 저장\n+    with open(\"passwords.txt\", \"w\") as file:\n+        file.write(password)\n+\n+    return \"완료\"\n \n+def new_email_logic(user_email):\n+    validate_email(user_email)\n+    print(f\"유효한 이메일 주소: {user_email}\")\n"
+  }
+}

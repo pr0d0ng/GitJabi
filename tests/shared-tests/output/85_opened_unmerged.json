@@ -1,0 +1,46 @@
+{
+  "action": "opened",
+  "number": 4974,
+  "pull_request": {
+    "id": 8339184094,
+    "number": 4974,
+    "state": "opened",
+    "title": "버그 수정: 사용자 인증 관련 문제 해결",
+    "body": "이 PR은 사용자 인증 로직에서 발생한 특정 버그를 수정합니다. 문제는 로그인 요청 시 사용자 세션이 올바르게 생성되지 않는 점에 있었습니다. 이로 인해 일부 사용자는 세션 없이 접근 가능 상태가 되어 보안 문제가 발생할 가능성이 있었습니다. 또한, 코드 리뷰 과정에서 민감한 데이터를 하드코딩으로 처리한 부분과 오래된 인증 방법이 발견되어 이를 개선했습니다. 수정 사항은 다음과 같습니다:\n\n1. 세션 생성 로직을 개선하여 사용자 인증 성공 후 세션이 정상적으로 생성되도록 수정했습니다.\n2. 하드코딩된 민감 정보(API 키 및 이메일)를 제거하고 환경 변수로 옮겼습니다.\n3. 비보안적인 코드 예제를 제거하고 더 안전한 인증 방법으로 대체했습니다.\n\n변경 사항은 보안 향상과 민감 데이터 보호를 목적으로 합니다. 추가적으로 알려진 보안 문제를 단계적으로 수정하고 있습니다. 리뷰를 통해 추가적인 개선 사항이 있다면 피드백 부탁드립니다!",
+    "created_at": "2026-02-20T02:59:53.182072+00:00Z",
+    "updated_at": "2026-02-20T02:59:53.182072+00:00Z",
+    "merged_at": null,
+    "merged": false,
+    "merged_by": null,
+    "draft": false,
+    "mergeable_state": "unknown",
+    "commits": 1,
+    "additions": 56,
+    "deletions": 34,
+    "changed_files": 5,
+    "user": {
+      "login": "user_66",
+      "id": 88506,
+      "type": "User",
+      "site_admin": false
+    },
+    "head": {
+      "ref": "dev",
+      "sha": "69db2a61b1dd424da73b8704b2ce11b4"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "e6ee389618e645288013aa1955be62d8"
+    }
+  },
+  "repository": {
+    "name": "secure-auth-system",
+    "full_name": "my-organization/secure-auth-system",
+    "private": false,
+    "language": "Python",
+    "default_branch": "main"
+  },
+  "additional_custom_data": {
+    "diff": "diff --git a/authentication.py b/authentication.py\nindex abc123..def456 100644\n--- a/authentication.py\n+++ b/authentication.py\n@@ -12,8 +12,12 @@ def login_user(username, password):\n     # 기존 하드코딩된 민감 정보 제거\n-    API_KEY = '12345-67890-ABCDE'\n-    admin_email = 'admin@example.com'\n+    import os\n+    API_KEY = os.getenv('API_KEY')\n+    admin_email = os.getenv('ADMIN_EMAIL')\n\n+    if not API_KEY or not admin_email:\n+        raise ValueError(\"API Key 또는 Admin Email이 설정되지 않았습니다.\")\n\n     # 세션 생성 로직 개선\n     session = create_session(username)\n@@ -34,7 +38,10 @@ def validate_credentials(username, password):\n     # 비보안적인 코드 예제 제거 및 수정\n-    if password == 'password123':\n-        return True\n+    import hashlib\n+    hashed_password = hashlib.sha256(password.encode()).hexdigest()\n+    stored_password = retrieve_stored_password(username)\n+    if hashed_password == stored_password:\n+        return True\n\n     return False"
+  }
+}
