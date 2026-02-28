@@ -1,0 +1,67 @@
+<!--
+    - Policies are applied in the order they appear.
+    - Position <base/> inside a section to inherit policies from the outer scope.
+    - Comments within policies are not preserved.
+-->
+<!-- Add policies as children to the <inbound>, <outbound>, <backend>, and <on-error> elements -->
+<policies>
+    <!-- Throttle, authorize, validate, cache, or transform the requests -->
+    <inbound>
+        <base />
+        <log-to-eventhub logger-id="eventhub_github_webhook">@{
+        // 1. 이벤트 타입
+        string eventType = context.Request.Headers.GetValueOrDefault("X-GitHub-Event", "unknown");
+
+        // 2. 원본 body
+        string rawBody = context.Request.Body.As<string>(preserveContent: true);
+        var parsedBody = Newtonsoft.Json.Linq.JObject.Parse(rawBody);
+
+        // 4. 최종 이벤트 구조
+        var finalObject = new Newtonsoft.Json.Linq.JObject();
+        finalObject["event_type"] = eventType;
+        finalObject["received_at"] = DateTime.UtcNow;
+        finalObject["payload"] = parsedBody;
+
+        return finalObject.ToString();
+    }</log-to-eventhub>
+        <!--
+        <log-to-eventhub logger-id="eventhublogger">@{
+        // 1. 헤더 안전하게 가져오기
+        string eventType = context.Request.Headers.GetValueOrDefault("X-GitHub-Event", "unknown");
+
+        // 3. 헤더 전체 수집
+        var headersObject = new Newtonsoft.Json.Linq.JObject();
+        foreach (var header in context.Request.Headers)
+        {
+            headersObject[header.Key] = string.Join(",", header.Value);
+        }
+
+        // 2. 바디 안전하게 읽기 (Null 체크 포함)
+        string body = "empty body";
+        if (context.Request != null && context.Request.Body != null) {
+            body = context.Request.Body.As<string>(preserveContent: true);
+        }
+
+        // 3. JSON 직렬화 및 반환
+        return Newtonsoft.Json.JsonConvert.SerializeObject(new {
+            event_type = eventType,
+            payload = body,
+            timestamp = DateTime.UtcNow
+        });
+        }</log-to-eventhub>
+
+        -->
+    </inbound>
+    <!-- Control if and how the requests are forwarded to services  -->
+    <backend>
+        <base />
+    </backend>
+    <!-- Customize the responses -->
+    <outbound>
+        <base />
+    </outbound>
+    <!-- Handle exceptions and customize error responses  -->
+    <on-error>
+        <base />
+    </on-error>
+</policies>

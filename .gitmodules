@@ -1,0 +1,15 @@
+[submodule "gitjabi-meeting-minutes-generator"]
+	path = gitjabi-meeting-minutes-generator
+	url = https://github.com/GitJabi-CloudData/gitjabi-meeting-minutes-generator.git
+[submodule "governance-engine"]
+	path = governance-engine
+	url = https://github.com/GitJabi-CloudData/governance-engine.git
+[submodule "gitjabi-nlp-engine-api-docker"]
+	path = gitjabi-nlp-engine-api-docker
+	url = https://github.com/GitJabi-CloudData/gitjabi-nlp-engine-api-docker.git
+[submodule "gitjabi-main-backend-api"]
+	path = gitjabi-main-backend-api
+	url = https://github.com/GitJabi-CloudData/gitjabi-main-backend-api.git
+[submodule "gitjabi-frontend-react"]
+	path = gitjabi-frontend-react
+	url = https://github.com/GitJabi-CloudData/gitjabi-frontend-react.git
