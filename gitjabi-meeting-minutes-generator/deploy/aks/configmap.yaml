@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: meeting-minutes-config
+  namespace: meeting-minutes
+data:
+  GRAPH_AUTH_MODE: "app"
+  SHAREPOINT_DOMAIN: "elixirrkc.sharepoint.com"
+  SHAREPOINT_SITE_NAME: "DATA2-2"
+  SHAREPOINT_SITE_PATH: "/sites/DATA2-2"
+  SHAREPOINT_FOLDER_PATH: "기록"
+  BLOB_CONTAINER_NAME: "meeting-videos"
+  BLOB_PREFIX: "meeting-minutes"
+  JOB_QUEUE_NAME: "meeting-minutes-jobs"
+  JOB_STORE_CONTAINER: "meeting-automation-state"
+  JOB_STORE_PREFIX: "job-store"
+  WORKER_MAX_CONCURRENCY: "1"
+  WORKER_POLL_INTERVAL_SEC: "5"
+  POLLER_MAX_ITEMS_PER_RUN: "1"
+  POLLER_STT_CHUNK_MINUTES: "20"
+  HF_HOME: "/tmp/hf"

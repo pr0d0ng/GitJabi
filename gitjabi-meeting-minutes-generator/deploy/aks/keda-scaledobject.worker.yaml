@@ -1,0 +1,18 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: meeting-minutes-worker-gpu-scaler
+  namespace: meeting-minutes
+spec:
+  scaleTargetRef:
+    name: meeting-minutes-worker-gpu
+  minReplicaCount: 0
+  maxReplicaCount: 1
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers:
+    - type: azure-queue
+      metadata:
+        queueName: meeting-minutes-jobs
+        queueLength: "1"
+        connectionFromEnv: BLOB_CONNECTION_STRING

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meeting-minutes-worker
+  namespace: meeting-minutes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: meeting-minutes-worker
+  template:
+    metadata:
+      labels:
+        app: meeting-minutes-worker
+    spec:
+      containers:
+        - name: meeting-minutes-worker
+          image: <acr-name>.azurecr.io/meeting-minutes-api:latest
+          imagePullPolicy: Always
+          command:
+            - python
+            - -m
+            - service.worker_loop
+          envFrom:
+            - configMapRef:
+                name: meeting-minutes-config
+            - secretRef:
+                name: meeting-minutes-secrets
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "8Gi"

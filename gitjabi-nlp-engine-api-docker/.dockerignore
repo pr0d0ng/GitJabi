@@ -1,0 +1,11 @@
+.git*
+**/*.pyc
+.venv/
+.git
+__pycache__
+venv
+.venv
+.env
+.vscode
+*.pyc
+*.pyo

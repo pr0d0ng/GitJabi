@@ -1,0 +1,11 @@
+fastapi
+pydantic
+psycopg2-binary
+requests
+uvicorn
+openai
+azure-search-documents
+python-dotenv
+dotenv
+PyGithub
+Cryptography

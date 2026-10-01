@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+
+keybert
+sentence-transformers
+scikit-learn
+
+kiwipiepy
+torch --index-url https://download.pytorch.org/whl/cpu

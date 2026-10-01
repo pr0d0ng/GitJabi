@@ -1,0 +1,10 @@
+.hide-scroll {
+  overflow-x: auto;
+  white-space: nowrap;
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
+}
+
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}

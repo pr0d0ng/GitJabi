@@ -1,0 +1,6 @@
+{
+    "gitignore": "none",
+    "includeFiles": [
+        ".env"
+    ]
+}

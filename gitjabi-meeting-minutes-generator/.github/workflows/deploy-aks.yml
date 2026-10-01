@@ -1,0 +1,131 @@
+name: Deploy Meeting Minutes API to AKS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "service/**"
+      - "deploy/aks/**"
+      - "docker/meeting-minutes-api.Dockerfile"
+      - ".dockerignore"
+      - "meeting_minutes_pipeline.py"
+      - "whisperx-worker/**"
+      - "requirements.txt"
+      - ".github/workflows/deploy-aks.yml"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      NAMESPACE: meeting-minutes
+      DEPLOYMENT_NAME: meeting-minutes-api
+      CONTAINER_NAME: meeting-minutes-api
+      IMAGE_NAME: meeting-minutes-api
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set image tag
+        run: echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_ENV
+
+      - name: Build ACR image URI
+        run: echo "IMAGE_URI=${{ secrets.ACR_NAME }}.azurecr.io/${IMAGE_NAME}:${IMAGE_TAG}" >> $GITHUB_ENV
+
+      - name: ACR Login
+        run: az acr login --name "${{ secrets.ACR_NAME }}"
+
+      - name: Download classifier models from Blob
+        env:
+          BLOB_CONNECTION_STRING: ${{ secrets.BLOB_CONNECTION_STRING }}
+          MODEL_BLOB_CONTAINER: ${{ secrets.MODEL_BLOB_CONTAINER }}
+          MODEL_BLOB_PREFIX: ${{ secrets.MODEL_BLOB_PREFIX }}
+        run: |
+          set -euo pipefail
+          if [ -z "${MODEL_BLOB_CONTAINER:-}" ] || [ -z "${MODEL_BLOB_PREFIX:-}" ]; then
+            echo "Missing MODEL_BLOB_CONTAINER or MODEL_BLOB_PREFIX secret."
+            exit 1
+          fi
+
+          mkdir -p outputs/summary_worthy/best_model
+          mkdir -p outputs/has_action_item/best_model
+
+          for file in config.json model.safetensors tokenizer.json tokenizer_config.json training_args.bin; do
+            az storage blob download \
+              --connection-string "${BLOB_CONNECTION_STRING}" \
+              --container-name "${MODEL_BLOB_CONTAINER}" \
+              --name "${MODEL_BLOB_PREFIX}/summary_worthy/best_model/${file}" \
+              --file "outputs/summary_worthy/best_model/${file}" \
+              --overwrite true
+
+            az storage blob download \
+              --connection-string "${BLOB_CONNECTION_STRING}" \
+              --container-name "${MODEL_BLOB_CONTAINER}" \
+              --name "${MODEL_BLOB_PREFIX}/has_action_item/best_model/${file}" \
+              --file "outputs/has_action_item/best_model/${file}" \
+              --overwrite true
+          done
+
+          ls -al outputs/summary_worthy/best_model
+          ls -al outputs/has_action_item/best_model
+
+      - name: Build and Push image
+        run: |
+          docker build -f docker/meeting-minutes-api.Dockerfile -t "${IMAGE_URI}" .
+          docker push "${IMAGE_URI}"
+
+      - name: Set AKS Context
+        run: az aks get-credentials --resource-group "${{ secrets.AKS_RESOURCE_GROUP }}" --name "${{ secrets.AKS_NAME }}" --overwrite-existing
+
+      - name: Create or update Kubernetes secret
+        env:
+          TENANT_ID: ${{ secrets.TENANT_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          BLOB_CONNECTION_STRING: ${{ secrets.BLOB_CONNECTION_STRING }}
+          LLAMA_ENDPOINT: ${{ secrets.LLAMA_ENDPOINT }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          MEETING_API_KEY: ${{ secrets.MEETING_API_KEY }}
+        run: |
+          kubectl create namespace "${NAMESPACE}" --dry-run=client -o yaml | kubectl apply -f -
+          kubectl -n "${NAMESPACE}" create secret generic meeting-minutes-secrets \
+            --from-literal=TENANT_ID="${TENANT_ID}" \
+            --from-literal=CLIENT_ID="${CLIENT_ID}" \
+            --from-literal=CLIENT_SECRET="${CLIENT_SECRET}" \
+            --from-literal=BLOB_CONNECTION_STRING="${BLOB_CONNECTION_STRING}" \
+            --from-literal=LLAMA_ENDPOINT="${LLAMA_ENDPOINT}" \
+            --from-literal=DATABRICKS_TOKEN="${DATABRICKS_TOKEN}" \
+            --from-literal=HF_TOKEN="${HF_TOKEN}" \
+            --from-literal=MEETING_API_KEY="${MEETING_API_KEY}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Apply manifests
+        run: |
+          sed -i "s#<acr-name>.azurecr.io/meeting-minutes-api:latest#${IMAGE_URI}#g" deploy/aks/deployment.yaml
+          sed -i "s#<acr-name>.azurecr.io/meeting-minutes-api:latest#${IMAGE_URI}#g" deploy/aks/worker-deployment.yaml
+          kubectl apply -f deploy/aks/namespace.yaml
+          kubectl apply -f deploy/aks/configmap.yaml
+          kubectl apply -f deploy/aks/deployment.yaml
+          kubectl apply -f deploy/aks/worker-deployment.yaml
+          kubectl apply -f deploy/aks/service.yaml
+
+      - name: Wait rollout
+        run: |
+          kubectl -n "${NAMESPACE}" rollout status deployment/"${DEPLOYMENT_NAME}" --timeout=600s
+          kubectl -n "${NAMESPACE}" rollout status deployment/meeting-minutes-worker --timeout=600s
+
+      - name: In-cluster health check
+        run: |
+          kubectl -n "${NAMESPACE}" run curlcheck --rm -i --restart=Never --image=curlimages/curl -- \
+            curl -sS "http://${DEPLOYMENT_NAME}:8080/healthz"

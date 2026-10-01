@@ -1,0 +1,34 @@
+.git
+.gitignore
+.env
+.venv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# local outputs / caches
+out/
+outputs/
+!outputs/summary_worthy/
+!outputs/summary_worthy/best_model/
+!outputs/summary_worthy/best_model/**
+!outputs/has_action_item/
+!outputs/has_action_item/best_model/
+!outputs/has_action_item/best_model/**
+temp/
+whisperx-worker/out/
+functions_poller/.venv/
+
+# large local datasets not needed at runtime
+datasets/
+finetune/
+ingest-api/
+summary-worker/
+experiments/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/

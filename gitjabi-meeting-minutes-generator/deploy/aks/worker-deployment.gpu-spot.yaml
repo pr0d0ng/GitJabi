@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meeting-minutes-worker-gpu
+  namespace: meeting-minutes
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: meeting-minutes-worker-gpu
+  template:
+    metadata:
+      labels:
+        app: meeting-minutes-worker-gpu
+    spec:
+      nodeSelector:
+        kubernetes.azure.com/agentpool: gpuspot
+      tolerations:
+        - key: kubernetes.azure.com/scalesetpriority
+          operator: Equal
+          value: spot
+          effect: NoSchedule
+      containers:
+        - name: meeting-minutes-worker-gpu
+          image: <acr-name>.azurecr.io/meeting-minutes-api:latest
+          imagePullPolicy: Always
+          command:
+            - python
+            - -m
+            - service.worker_loop
+          envFrom:
+            - configMapRef:
+                name: meeting-minutes-config
+            - secretRef:
+                name: meeting-minutes-secrets
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "4Gi"
+              nvidia.com/gpu: "1"
+            limits:
+              cpu: "2"
+              memory: "8Gi"
+              nvidia.com/gpu: "1"
